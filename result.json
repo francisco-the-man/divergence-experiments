@@ -1,0 +1,226 @@
+{
+  "ticket_id": "tk_81f75b5a",
+  "idea_text": "task 7 test \u2014 small sweep auto-approve",
+  "plan": {
+    "hypothesis": "small sweeps auto-approve",
+    "modal_function_name": "pi_estimator_task",
+    "generated_tasks": {
+      "n_tasks": 20,
+      "base_params": {
+        "n_samples": 200000
+      }
+    }
+  },
+  "spec": {
+    "name": "pi_estimator_task",
+    "cpu_cores": 0.25,
+    "memory_gb": 0.125,
+    "description": "Monte Carlo \u03c0 estimate over a single random-sample chunk.",
+    "params_doc": "{\"n_samples\": int, \"seed\": int}"
+  },
+  "tasks": [
+    {
+      "n_samples": 200000,
+      "seed": 0
+    },
+    {
+      "n_samples": 200000,
+      "seed": 1
+    },
+    {
+      "n_samples": 200000,
+      "seed": 2
+    },
+    {
+      "n_samples": 200000,
+      "seed": 3
+    },
+    {
+      "n_samples": 200000,
+      "seed": 4
+    },
+    {
+      "n_samples": 200000,
+      "seed": 5
+    },
+    {
+      "n_samples": 200000,
+      "seed": 6
+    },
+    {
+      "n_samples": 200000,
+      "seed": 7
+    },
+    {
+      "n_samples": 200000,
+      "seed": 8
+    },
+    {
+      "n_samples": 200000,
+      "seed": 9
+    },
+    {
+      "n_samples": 200000,
+      "seed": 10
+    },
+    {
+      "n_samples": 200000,
+      "seed": 11
+    },
+    {
+      "n_samples": 200000,
+      "seed": 12
+    },
+    {
+      "n_samples": 200000,
+      "seed": 13
+    },
+    {
+      "n_samples": 200000,
+      "seed": 14
+    },
+    {
+      "n_samples": 200000,
+      "seed": 15
+    },
+    {
+      "n_samples": 200000,
+      "seed": 16
+    },
+    {
+      "n_samples": 200000,
+      "seed": 17
+    },
+    {
+      "n_samples": 200000,
+      "seed": 18
+    },
+    {
+      "n_samples": 200000,
+      "seed": 19
+    }
+  ],
+  "results": [
+    {
+      "n_samples": 200000,
+      "inside": 157144,
+      "estimate": 3.14288,
+      "seed": 0
+    },
+    {
+      "n_samples": 200000,
+      "inside": 156860,
+      "estimate": 3.1372,
+      "seed": 1
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157245,
+      "estimate": 3.1449,
+      "seed": 2
+    },
+    {
+      "n_samples": 200000,
+      "inside": 156891,
+      "estimate": 3.13782,
+      "seed": 3
+    },
+    {
+      "n_samples": 200000,
+      "inside": 156955,
+      "estimate": 3.1391,
+      "seed": 4
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157025,
+      "estimate": 3.1405,
+      "seed": 5
+    },
+    {
+      "n_samples": 200000,
+      "inside": 156801,
+      "estimate": 3.13602,
+      "seed": 6
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157102,
+      "estimate": 3.14204,
+      "seed": 7
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157471,
+      "estimate": 3.14942,
+      "seed": 8
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157064,
+      "estimate": 3.14128,
+      "seed": 9
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157257,
+      "estimate": 3.14514,
+      "seed": 10
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157093,
+      "estimate": 3.14186,
+      "seed": 11
+    },
+    {
+      "n_samples": 200000,
+      "inside": 156984,
+      "estimate": 3.13968,
+      "seed": 12
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157127,
+      "estimate": 3.14254,
+      "seed": 13
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157141,
+      "estimate": 3.14282,
+      "seed": 14
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157066,
+      "estimate": 3.14132,
+      "seed": 15
+    },
+    {
+      "n_samples": 200000,
+      "inside": 156932,
+      "estimate": 3.13864,
+      "seed": 16
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157059,
+      "estimate": 3.14118,
+      "seed": 17
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157042,
+      "estimate": 3.14084,
+      "seed": 18
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157323,
+      "estimate": 3.14646,
+      "seed": 19
+    }
+  ],
+  "actual_cost_usd": 0.00020369256937933364
+}
