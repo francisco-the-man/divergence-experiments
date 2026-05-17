@@ -1,0 +1,76 @@
+{
+  "ticket_id": "tk_753c562a",
+  "idea_text": "task 6 test \u2014 github + email pipeline",
+  "plan": {
+    "hypothesis": "task 6 wiring works"
+  },
+  "result": {
+    "total_samples": 2000000,
+    "pi_estimate": 3.141116,
+    "abs_error": 0.00047665358979331884,
+    "wall_time_sec": 2.874006532000003,
+    "cost_usd": 0.00029027465973200024
+  },
+  "chunks": [
+    {
+      "n_samples": 200000,
+      "inside": 157144,
+      "estimate": 3.14288,
+      "seed": 0
+    },
+    {
+      "n_samples": 200000,
+      "inside": 156860,
+      "estimate": 3.1372,
+      "seed": 1
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157245,
+      "estimate": 3.1449,
+      "seed": 2
+    },
+    {
+      "n_samples": 200000,
+      "inside": 156891,
+      "estimate": 3.13782,
+      "seed": 3
+    },
+    {
+      "n_samples": 200000,
+      "inside": 156955,
+      "estimate": 3.1391,
+      "seed": 4
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157025,
+      "estimate": 3.1405,
+      "seed": 5
+    },
+    {
+      "n_samples": 200000,
+      "inside": 156801,
+      "estimate": 3.13602,
+      "seed": 6
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157102,
+      "estimate": 3.14204,
+      "seed": 7
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157471,
+      "estimate": 3.14942,
+      "seed": 8
+    },
+    {
+      "n_samples": 200000,
+      "inside": 157064,
+      "estimate": 3.14128,
+      "seed": 9
+    }
+  ]
+}
