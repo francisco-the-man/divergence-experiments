@@ -1,0 +1,219 @@
+{
+  "n_results": 540,
+  "n_planned_tasks": 540,
+  "n_planned_targets": 6,
+  "n_observed_targets": 6,
+  "observed_target_ids": ["T1_poly_sep", "T2_coupled", "T3_rational", "T4_deep_mul", "T5_transcend", "T6_inexpressible"],
+  "complete_targets": ["T2_coupled", "T3_rational", "T4_deep_mul", "T5_transcend", "T6_inexpressible"],
+  "n_complete_targets": 5,
+  "sigma_M_by_target": {
+    "T2_coupled": 0.0014,
+    "T3_rational": 0.6278,
+    "T4_deep_mul": 0.286,
+    "T5_transcend": 0.0024,
+    "T6_inexpressible": 0.0216
+  },
+  "sigma_S_by_target": {
+    "T2_coupled": 0.0019,
+    "T3_rational": 0.2626,
+    "T4_deep_mul": 0.3133,
+    "T5_transcend": 0.0126,
+    "T6_inexpressible": 0.0046
+  },
+  "sigma_C_by_target": {
+    "T2_coupled": 1.8681,
+    "T3_rational": 0.9033,
+    "T4_deep_mul": 1.2162,
+    "T5_transcend": 1.3179,
+    "T6_inexpressible": 1.6524
+  },
+  "delta_sigma_CS_by_target": {
+    "T2_coupled": 1.8662,
+    "T3_rational": 0.6407,
+    "T4_deep_mul": 0.9028,
+    "T5_transcend": 1.3053,
+    "T6_inexpressible": 1.6479
+  },
+  "delta_sigma_SM_by_target": {
+    "T2_coupled": 0.0005,
+    "T3_rational": -0.3652,
+    "T4_deep_mul": 0.0274,
+    "T5_transcend": 0.0102,
+    "T6_inexpressible": -0.017
+  },
+  "delta_sigma_CM_by_target": {
+    "T2_coupled": 1.8667,
+    "T3_rational": 0.2755,
+    "T4_deep_mul": 0.9302,
+    "T5_transcend": 1.3155,
+    "T6_inexpressible": 1.6309
+  },
+  "wilcoxon_V": 15,
+  "wilcoxon_p": 0.0312,
+  "wilcoxon_n_pairs": 5,
+  "wilcoxon_n_positive_CS": 5,
+  "wilcoxon_median_delta_CS": 1.3053,
+  "wilcoxon_sensitivity_p": null,
+  "wilcoxon_sensitivity_note": "T6 not present in data; sensitivity check N/A",
+  "spearman_static_available": false,
+  "spearman_static_note": "E-graph measurement tasks (kind=egraph_measure) absent from result.json; static observables (Δsize, Δconnectivity) cannot be computed. Test (ii) cannot be evaluated.",
+  "rho_deltaC_vs_deltaS": 0.1,
+  "rho_deltaC_vs_deltaS_p": 0.8729,
+  "csn_by_cell": {
+    "T1_poly_sep|M": {
+      "target": "T1_poly_sep",
+      "condition": "M",
+      "R": null,
+      "p": null,
+      "n_tail": 2,
+      "xmin": null
+    },
+    "T1_poly_sep|S": {
+      "target": "T1_poly_sep",
+      "condition": "S",
+      "R": null,
+      "p": null,
+      "n_tail": 1,
+      "xmin": null
+    },
+    "T1_poly_sep|C": {
+      "target": "T1_poly_sep",
+      "condition": "C",
+      "R": 20.2087,
+      "p": 0.0019,
+      "n_tail": 172,
+      "xmin": 4
+    },
+    "T2_coupled|M": {
+      "target": "T2_coupled",
+      "condition": "M",
+      "R": null,
+      "p": null,
+      "n_tail": 3,
+      "xmin": null
+    },
+    "T2_coupled|S": {
+      "target": "T2_coupled",
+      "condition": "S",
+      "R": null,
+      "p": null,
+      "n_tail": 3,
+      "xmin": null
+    },
+    "T2_coupled|C": {
+      "target": "T2_coupled",
+      "condition": "C",
+      "R": 2.468,
+      "p": 0.5698,
+      "n_tail": 137,
+      "xmin": 6.2
+    },
+    "T3_rational|M": {
+      "target": "T3_rational",
+      "condition": "M",
+      "R": -2.755,
+      "p": 0.0025,
+      "n_tail": 20,
+      "xmin": 19.4
+    },
+    "T3_rational|S": {
+      "target": "T3_rational",
+      "condition": "S",
+      "R": null,
+      "p": null,
+      "n_tail": 19,
+      "xmin": 276.1
+    },
+    "T3_rational|C": {
+      "target": "T3_rational",
+      "condition": "C",
+      "R": 5.1322,
+      "p": 0.1861,
+      "n_tail": 120,
+      "xmin": 9
+    },
+    "T4_deep_mul|M": {
+      "target": "T4_deep_mul",
+      "condition": "M",
+      "R": null,
+      "p": null,
+      "n_tail": 12,
+      "xmin": null
+    },
+    "T4_deep_mul|S": {
+      "target": "T4_deep_mul",
+      "condition": "S",
+      "R": 8.5658,
+      "p": 0.2947,
+      "n_tail": 27,
+      "xmin": 2
+    },
+    "T4_deep_mul|C": {
+      "target": "T4_deep_mul",
+      "condition": "C",
+      "R": 68.7056,
+      "p": 2.7343e-10,
+      "n_tail": 181,
+      "xmin": 3
+    },
+    "T5_transcend|M": {
+      "target": "T5_transcend",
+      "condition": "M",
+      "R": null,
+      "p": null,
+      "n_tail": 3,
+      "xmin": null
+    },
+    "T5_transcend|S": {
+      "target": "T5_transcend",
+      "condition": "S",
+      "R": null,
+      "p": null,
+      "n_tail": 4,
+      "xmin": null
+    },
+    "T5_transcend|C": {
+      "target": "T5_transcend",
+      "condition": "C",
+      "R": 9.9906,
+      "p": 0.143,
+      "n_tail": 170,
+      "xmin": 5
+    },
+    "T6_inexpressible|M": {
+      "target": "T6_inexpressible",
+      "condition": "M",
+      "R": null,
+      "p": null,
+      "n_tail": 5,
+      "xmin": null
+    },
+    "T6_inexpressible|S": {
+      "target": "T6_inexpressible",
+      "condition": "S",
+      "R": null,
+      "p": null,
+      "n_tail": 7,
+      "xmin": null
+    },
+    "T6_inexpressible|C": {
+      "target": "T6_inexpressible",
+      "condition": "C",
+      "R": 65.1364,
+      "p": 5.8032e-08,
+      "n_tail": 229,
+      "xmin": 2.4
+    }
+  },
+  "csn_n_C_cells": 5,
+  "csn_n_S_cells": 5,
+  "csn_C_lognormal_significant": 2,
+  "csn_S_exponential_significant": 0,
+  "csn_C_lognormal_threshold": 4,
+  "csn_S_exponential_threshold": 3,
+  "crit_i_wilcoxon_fires": false,
+  "crit_ii_spearman_fires": true,
+  "crit_iii_csn_fires": true,
+  "mechanism_demonstrated": false,
+  "data_completeness_note": "Plan called for 540 tasks across 6 targets x 3 conditions x 30 reps; result.json contains 540 gp_run results covering 6 target(s): T1_poly_sep, T2_coupled, T3_rational, T4_deep_mul, T5_transcend, T6_inexpressible. Targets T4_deep_mul, T5_transcend, T6_inexpressible absent; T3_rational partial (20 reps)."
+}
