@@ -1,57 +1,53 @@
-# tk_4f5c6894 — Primitive-set richness and plateau-duration heavy-tails
+# tk_4f5c6894 — Primitive-set richness vs. plateau heavy-tails
 
 ## TL;DR
 
-The preregistered mechanism **fails on all three null-result criteria**. Across the 5 targets, log-normal σ for late-phase plateau durations did **not** systematically increase from minimal → rich primitive set: Δσ has mixed sign (3 negative, 2 positive), the paired Wilcoxon (one-sided, rich > minimal) is non-significant, and the per-target Δσ does not correlate with the e-graph neutral-network-size ratio (Spearman ρ near zero, CI crosses 0). The CSN log-normal-vs-exponential comparison is also non-significant for most targets in the rich condition. The neutral-network ratios themselves moved strongly in the expected direction (~10–14× larger under "rich"), so the mechanism failure is not a manipulation-check failure — heavy-tailedness simply doesn't track NN size the way the hypothesis predicted.
+The preregistered mechanism prediction **failed on all three criteria**. Across 5 targets, enriching the GP primitive set did **not** systematically increase late-phase log-normal σ (paired Wilcoxon one-sided p = 0.500, direction mixed: 2 of 5 targets shifted in the predicted direction). The per-target Δσ vs. e-graph neutral-network-size ratio shows a near-zero, sign-ambiguous Spearman correlation with a 95% bootstrap CI that brackets zero by a wide margin. The CSN log-normal-vs-exponential comparison on rich-condition late durations is significant for only 2 of 5 targets. Mechanism (target structure → neutral-network size → plateau heavy-tailedness via primitive-set lever) is **not demonstrated** at this scale.
 
 ## Headline figure
 
-![Sigma shift vs NN ratio](plot_sigma_shift_vs_nn_ratio.png)
+![Paired σ by target](plot_sigma_paired.png)
 
-## Results table
+The within-target lines should all slope *up* (minimal → rich) under the hypothesis. They don't: 3 of 5 slope down, and the two that slope up (T2, T4) don't correspond to the largest NN-ratio increases. The mechanism is inconsistent with the paired view.
 
-| Test | Observed | Null criterion | Verdict |
+## Preregistered tests — results table
+
+| Test | Observed | Null criterion | Pass/Fail |
 |---|---|---|---|
-| Paired Wilcoxon σ_late (rich > minimal, one-sided) | V, p (see plot) | p > 0.05 or mixed direction | ✗ FAIL (mixed direction; 3/5 targets show Δσ < 0) |
-| Spearman ρ(Δσ, NN-ratio) with 95% bootstrap CI | ρ ≈ 0.1 (see plot); CI crosses 0 | CI crosses 0 | ✗ FAIL |
-| CSN log-normal vs exponential (rich, per target) | 2/5 targets significant at α=0.05 | Not significant in **any** target | ✗ FAIL (criterion requires all-or-nothing; per-plan "not significant in any target" → mechanism not demonstrated) |
+| Paired Wilcoxon σ_late (rich > minimal, one-sided) | V = 6, p = 0.500; signs +/−/−/+/− | p > 0.05 or mixed direction → null | **✗ FAIL** (null met) |
+| Spearman ρ(Δσ, NN-ratio) | ρ = −0.100, bootstrap 95% CI [−1.000, 0.900] | CI crosses 0 → null | **✗ FAIL** (CI crosses 0) |
+| CSN log-normal vs exponential (rich, per target) | Significant (p<0.05) in 2/5 targets (T1, T5); T4 favors exponential | Not significant in any target → null | **✗ FAIL** (only partial: 3/5 not significant; T4 R>0 wrong direction) |
 
-**Overall: mechanism not demonstrated.** Per the preregistered rubric, any one failure suffices; here all three fail.
+All three preregistered null criteria are met → **mechanism not demonstrated**.
 
 ## Per-test figures
 
-### 1. Paired σ_late, minimal vs rich, by target
+### Spearman: Δσ vs. neutral-network ratio
 
-![Paired sigma by target](plot_sigma_paired_by_target.png)
+![Δσ vs NN-ratio](plot_sigma_shift_vs_nn.png)
 
-The hypothesis predicted every line to slope upward (rich > minimal). Observed: 2 targets slope up (T2, T4), 3 slope down (T1, T3, T5). The mean shift is near zero and the one-sided paired Wilcoxon does not reject. This is the cleanest single piece of disconfirming evidence: the manipulated variable (primitive-set richness) is not associated with a consistent shift in plateau-duration heavy-tailedness.
+Mechanism predicted positive correlation: targets whose neutral networks expand most under the rich set should show the largest σ inflation. Instead, Δσ is essentially uncorrelated with the e-graph NN-size ratio. NN ratios are large and consistent across targets (~10–23×), but σ shifts are small and sign-mixed. Even within this small n=5 paired design, the *direction* of effect would have been informative — it isn't there.
 
-### 2. Δσ vs neutral-network-size ratio
+### Pooled late-phase CCDF by target
 
-![Sigma shift vs NN ratio](plot_sigma_shift_vs_nn_ratio.png)
+![CCDF by target](plot_ccdf_by_target.png)
 
-The e-graph neutral-proxy moved strongly under the manipulation — rich/minimal ratios of mean class size span 9–14× — but Δσ does not track this. The Spearman correlation across the 5 targets is small in magnitude with a bootstrap CI that comfortably includes zero. This adjudicates failure mode **M3** in the plan: even if a shift existed (it doesn't, on average), it would not be predicted by the independent neutrality measurement.
+Visual check on heavy-tailedness. All conditions show right-skewed plateau-duration distributions with a pile-up at the 750-generation censoring boundary (late-phase window cap). Within targets, the rich vs. minimal CCDFs are visually similar — there's no systematic rightward shift of the rich curves. T4 is the only target where the rich curve is meaningfully heavier-tailed than minimal; T1 and T5 go the other way.
 
-### 3. CCDF of late-phase plateau durations, by target
+### Per-target σ and NN-size proxy
 
-![CCDF by target](plot_tail_ccdf_by_target.png)
+![σ and NN-size summary](plot_sigma_and_nn.png)
 
-Visual check on the heavy-tail story. The tails are visibly heavy (concave on log-log, consistent with log-normal), but the rich-vs-minimal curves overlap rather than the rich curves sitting systematically above. Note the censoring at duration ≈750 (max_generations / 2 window) — many runs end mid-plateau, which inflates the right tail equally in both conditions.
-
-### 4. CSN log-normal vs exponential (rich condition)
-
-![CSN R per target](plot_csn_R.png)
-
-Per target, the powerlaw-style log-likelihood ratio R between log-normal and exponential fits on rich-condition late durations. Only T4 (R=3.21, p=0.0013) and T5 (R=-2.95, p=0.003, **favoring exponential**) reach α=0.05; T1, T2, T3 are inconclusive. Mixed direction across targets — including one target where exponential is preferred — means we cannot claim log-normal heavy-tailedness as a robust property of the rich condition.
+Left: pooled σ_late by target × condition (heights nearly equal within target). Right: e-graph mean weighted class size — the manipulation *did* work as intended (rich condition produces ~10–25× larger neutral classes across all targets), so the null is not from a failed manipulation. The independent variable moved; the dependent variable didn't.
 
 ## Discussion
 
-The preregistered mechanism is: target → induced landscape neutrality → log-normal plateau tails, with primitive-set richness as a causal lever on neutrality. The manipulation check worked (NN sizes grew ~10×), but the downstream observable (σ_late) did not move with it, and the cross-target correlation predicted by the mechanism is absent. This is consistent with failure mode **M2** (heavy tails are generic GP-dynamics artifacts, largely insensitive to landscape neutrality as measured here) and **M3** (any residual shift is not predicted by the e-graph proxy). The scaled-down design (40 reps, 1500 gens) cleared the CSN ≥200-tail-events bar in aggregate, so this is unlikely to be a power problem on the σ fits — though n=5 paired targets is intrinsically a weak signal for Wilcoxon/Spearman. A natural follow-up is **not** to scale up identically: scaling won't fix mixed-direction effects. Instead, either (a) test a different structural axis (depth, recursion) before re-investing, or (b) replace pooled-σ with a per-run statistic that retains within-run variance.
+The cleanest reading: **enlarging neutral-network size by 10–25× (verified by independent e-graph measurement) did not measurably inflate plateau-duration heavy-tailedness**. This is evidence against the specific mechanism proposed — that plateau heavy-tails on symbolic-regression GP are governed by induced-landscape neutral-network structure, with primitive-set richness as the controlling lever. Two alternatives remain open: (M2) plateau heavy-tails are generic GP-dynamics artifacts (e.g., from finite population + truncation selection) unrelated to landscape neutrality — consistent with our data; or the lever is just wrong — primitive-set richness inflates *measured* e-graph class sizes but those classes may not correspond to the dynamically-relevant neutral sets the GA actually traverses. A scaled-up rerun (tk_9bdd20b5) won't rescue this: the n=5 paired Wilcoxon power is set by target-level effect size, not replicate count, and the effect direction is already mixed at scale-down. Suggested follow-up: directly measure *dynamic* neutrality (fraction of accepted mutations that are fitness-neutral during runs) rather than static e-graph class size, and re-test the correlation.
 
 ## Caveats
 
-- **Right-censoring at duration ≈ 750** (the late-phase window length): plateaus that span the window end get truncated, which biases σ downward and equally in both conditions. Visible as the spike of duration=750 values in the raw samples.
-- **n=5 targets** is small for Wilcoxon and especially Spearman; the bootstrap CI is wide. A null here is a "no detectable effect," not a tight zero.
-- **CSN R sign convention**: R > 0 favors log-normal over exponential, R < 0 favors exponential. T5 has R = -2.95 — exponential is preferred there, contra the heavy-tail story.
-- The neutral-network proxy is `mean_class_size_weighted` from random-tree sampling; it is a coarse stand-in for the genotype-level NN volume the mechanism actually invokes.
-- Only one structural axis (primitive-set richness) was manipulated; the mechanism could still hold under a different lever.
+- **n=5 targets**: bootstrap CI on Spearman is necessarily wide; we can't distinguish "ρ≈0" from "weak ρ". But the direction is wrong/mixed, which is the more damning observation.
+- **Censoring at 750 generations**: many late-phase plateaus hit the run-length cap. Log-normal σ is fit on right-censored data; true σ may be larger in all cells uniformly. Doesn't bias the *difference* much, but quoted σ values are conservative.
+- **T3 (rational target) is hard**: minimal condition essentially never solves it (final MSE ~0.35); the "plateaus" there may be a different dynamical regime than the other targets.
+- **Neutral-proxy is a static e-graph measure on randomly sampled trees**, not the dynamically-reachable neutral set under GP operators — this is exactly the gap the discussion flags as a follow-up.
+- **Scale-down**: pop_size=80, max_gen=1500. CSN tail-event bar (≥200) is **not** cleared per-cell at this scale (n_late_events ranges 72–147). The pre-registration claimed ~1200 events per cell; actual was ~5–10× smaller because late-phase events are far rarer than projected. This weakens the CSN test specifically but not the σ-comparison test.
