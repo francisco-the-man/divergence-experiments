@@ -1,0 +1,149 @@
+{
+  "targets": ["T1_poly_sep", "T2_coupled", "T3_rational", "T4_deep_mul", "T5_transcend"],
+  "sigma_minimal": {
+    "T1_poly_sep": 2.0835,
+    "T2_coupled": 1.7606,
+    "T3_rational": 2.0508,
+    "T4_deep_mul": 1.5608,
+    "T5_transcend": 1.9186
+  },
+  "sigma_rich": {
+    "T1_poly_sep": 1.7626,
+    "T2_coupled": 2.0267,
+    "T3_rational": 2.0004,
+    "T4_deep_mul": 2.015,
+    "T5_transcend": 1.5865
+  },
+  "delta_sigma": {
+    "T1_poly_sep": -0.3209,
+    "T2_coupled": 0.2662,
+    "T3_rational": -0.0504,
+    "T4_deep_mul": 0.4541,
+    "T5_transcend": -0.3322
+  },
+  "nn_minimal": {
+    "T1_poly_sep": 4.829,
+    "T2_coupled": 4.178,
+    "T3_rational": 8.418,
+    "T4_deep_mul": 3.599,
+    "T5_transcend": 9.413
+  },
+  "nn_rich": {
+    "T1_poly_sep": 50.982,
+    "T2_coupled": 59.072,
+    "T3_rational": 81.587,
+    "T4_deep_mul": 50.158,
+    "T5_transcend": 85.939
+  },
+  "nn_ratio": {
+    "T1_poly_sep": 10.5575,
+    "T2_coupled": 14.1388,
+    "T3_rational": 9.692,
+    "T4_deep_mul": 13.9366,
+    "T5_transcend": 9.1298
+  },
+  "per_target_table": [
+    {
+      "target_id": "T1_poly_sep",
+      "sigma_minimal": 2.0835,
+      "sigma_rich": 1.7626,
+      "delta_sigma": -0.3209,
+      "nn_minimal": 4.829,
+      "nn_rich": 50.982,
+      "nn_ratio": 10.5575
+    },
+    {
+      "target_id": "T2_coupled",
+      "sigma_minimal": 1.7606,
+      "sigma_rich": 2.0267,
+      "delta_sigma": 0.2662,
+      "nn_minimal": 4.178,
+      "nn_rich": 59.072,
+      "nn_ratio": 14.1388
+    },
+    {
+      "target_id": "T3_rational",
+      "sigma_minimal": 2.0508,
+      "sigma_rich": 2.0004,
+      "delta_sigma": -0.0504,
+      "nn_minimal": 8.418,
+      "nn_rich": 81.587,
+      "nn_ratio": 9.692
+    },
+    {
+      "target_id": "T4_deep_mul",
+      "sigma_minimal": 1.5608,
+      "sigma_rich": 2.015,
+      "delta_sigma": 0.4541,
+      "nn_minimal": 3.599,
+      "nn_rich": 50.158,
+      "nn_ratio": 13.9366
+    },
+    {
+      "target_id": "T5_transcend",
+      "sigma_minimal": 1.9186,
+      "sigma_rich": 1.5865,
+      "delta_sigma": -0.3322,
+      "nn_minimal": 9.413,
+      "nn_rich": 85.939,
+      "nn_ratio": 9.1298
+    }
+  ],
+  "wilcoxon_V": 7,
+  "wilcoxon_p": 0.5938,
+  "wilcoxon_alternative": "greater",
+  "direction_consistent": false,
+  "n_targets_rich_gt_minimal": 2,
+  "n_targets_total": 5,
+  "spearman_rho": 0.8,
+  "spearman_p": 0.1333,
+  "spearman_ci_low": 0.1111,
+  "spearman_ci_high": 1,
+  "spearman_ci_crosses_zero": false,
+  "csn_per_target": [
+    {
+      "target_id": "T1_poly_sep",
+      "R": -3.9219,
+      "p": 0.0001,
+      "significant": true,
+      "lognormal_preferred": true
+    },
+    {
+      "target_id": "T2_coupled",
+      "R": 1.8198,
+      "p": 0.0688,
+      "significant": false,
+      "lognormal_preferred": false
+    },
+    {
+      "target_id": "T3_rational",
+      "R": 1.5127,
+      "p": 0.1304,
+      "significant": false,
+      "lognormal_preferred": false
+    },
+    {
+      "target_id": "T4_deep_mul",
+      "R": 3.213,
+      "p": 0.0013,
+      "significant": true,
+      "lognormal_preferred": false
+    },
+    {
+      "target_id": "T5_transcend",
+      "R": -2.9461,
+      "p": 0.0032,
+      "significant": true,
+      "lognormal_preferred": true
+    }
+  ],
+  "n_targets_csn_significant": 3,
+  "any_csn_significant": true,
+  "crit_i_fail": true,
+  "crit_ii_fail": false,
+  "crit_iii_fail": false,
+  "mechanism_demonstrated": false,
+  "wilcoxon_pass": false,
+  "spearman_pass": true,
+  "csn_pass": true
+}
