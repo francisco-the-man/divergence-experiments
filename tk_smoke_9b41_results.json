@@ -1,0 +1,58 @@
+{
+  "results": [
+    {
+      "n_samples": 100,
+      "seed": 0,
+      "sample_mean": 0.08109669349071558,
+      "sample_stddev": 0.966977496643552
+    },
+    {
+      "n_samples": 100,
+      "seed": 1,
+      "sample_mean": -0.07361212127294708,
+      "sample_stddev": 0.8558467188443056
+    },
+    {
+      "n_samples": 100,
+      "seed": 2,
+      "sample_mean": -0.00841939959724627,
+      "sample_stddev": 0.956121466546731
+    },
+    {
+      "n_samples": 1000,
+      "seed": 0,
+      "sample_mean": -0.04802827676298692,
+      "sample_stddev": 0.9772417054261473
+    },
+    {
+      "n_samples": 1000,
+      "seed": 1,
+      "sample_mean": -0.05425322276336561,
+      "sample_stddev": 0.9867546385749537
+    },
+    {
+      "n_samples": 1000,
+      "seed": 2,
+      "sample_mean": -0.022409060642830412,
+      "sample_stddev": 1.0133342787096042
+    },
+    {
+      "n_samples": 10000,
+      "seed": 0,
+      "sample_mean": 0.006311887047966116,
+      "sample_stddev": 0.9981267701716074
+    },
+    {
+      "n_samples": 10000,
+      "seed": 1,
+      "sample_mean": -0.0109129011208452,
+      "sample_stddev": 0.9985459581760318
+    },
+    {
+      "n_samples": 10000,
+      "seed": 2,
+      "sample_mean": 0.01287177788223852,
+      "sample_stddev": 1.0054479185321645
+    }
+  ]
+}
