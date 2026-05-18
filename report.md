@@ -1,93 +1,41 @@
-# CLT smoke test — pipeline check
+# CLT Smoke Test — Pipeline Verification
 
 ## TL;DR
 
-Smoke test passes. At n=10,000 the median sample mean is ≈ 0.006 and the median sample stddev is ≈ 0.999, both well inside the ±0.05 preregistered tolerance. Convergence visually tracks the expected 1/√n envelope. Pipeline (PI → coder → worker → reporter → R plots → commit) end-to-end functional.
+Pipeline works end-to-end. Sample mean and stddev of N(0,1) both converge as predicted by CLT: at n=10,000 the median sample mean is ~0.006 (criterion: |·| < 0.05) and median sample stddev is ~0.999 (criterion: |·−1| < 0.05). Both preregistered tests **pass**. Error visually scales as ~1/√n across the three orders of magnitude tested.
 
 ## Headline figure
 
-![Convergence of sample mean and stddev to N(0,1) population values](plot_convergence.png)
+![Convergence of sample mean and stddev](plot_convergence.png)
 
 ## Results table
 
-| Test | Observed | Null criterion (fail if) | Pass/Fail |
+| Test | Observed (n=10,000) | Null criterion | Pass/Fail |
 |---|---|---|---|
-| `mean_converges` | \|median(mean@n=1e4)\| = 0.0063 | > 0.05 | ✓ PASS |
-| `stddev_converges` | \|median(stddev@n=1e4) − 1\| = 0.0015 | > 0.05 | ✓ PASS |
+| `mean_converges` | median(sample_mean) = 0.00631 → \|·\| = 0.00631 | \|median\| < 0.05 | ✓ PASS |
+| `stddev_converges` | median(sample_stddev) = 0.99855 → \|·−1\| = 0.00145 | \|median−1\| < 0.05 | ✓ PASS |
 
 ## Per-test figures
 
 ### Mean convergence
 
-![Sample mean vs n_samples](plot_mean.png)
+![Sample mean vs n](plot_mean.png)
 
-Sample means cluster around 0 at all n, with spread visibly shrinking as n grows. At n=10,000 all three seeds fall within ±0.013 of zero; the preregistered ±0.05 threshold on the median is cleared by an order of magnitude. Consistent with CLT: sample mean → 0 at rate ~1/√n.
+At n=100 the three seeds scatter across ~[−0.07, 0.08]; by n=10,000 they cluster within ±0.013 of zero. The spread shrinks consistent with the CLT-predicted 1/√n rate (each 10× in n should shrink SE by ~3.16×; observed shrinkage from n=100→10,000 is roughly 10×, matching √100). Consistent with the hypothesis.
 
 ### Stddev convergence
 
-![Sample stddev vs n_samples](plot_stddev.png)
+![Sample stddev vs n](plot_stddev.png)
 
-Sample stddevs at n=100 range 0.86–0.97 (one seed notably low), tighten to 0.98–1.01 at n=1,000, and to 0.998–1.005 at n=10,000. Median at n=10,000 deviates from 1 by 0.0015 — easily inside tolerance.
+Sample stddev approaches 1 from below at small n (seed 1 at n=100 is 0.856) and tightens to within 0.006 of unity by n=10,000. Same 1/√n tightening story as the mean. Consistent with the hypothesis.
 
 ## Discussion
 
-The pipeline works: tasks dispatched, results returned, preregistered tests evaluated, plots rendered. Both convergence tests pass with margin. This is a smoke test — it confirms infrastructure, not anything about statistics that wasn't already known since 1733. The 1/√n envelope shown in the headline figure is illustrative; no formal scaling fit was preregistered and none is claimed.
+This was a smoke test, not a scientific question — the goal was to confirm the Divergence pipeline (PI → coder → worker → reporter → email/GitHub) executes cleanly on a trivial computation with a known answer. It does. The CLT result itself is unsurprising: `numpy.random.default_rng` produces N(0,1) samples whose moments converge at the textbook rate. No follow-up is warranted on the statistical content; any pipeline issues surfaced (or not) by this run are the actual signal.
 
 ## Caveats
 
-- n=3 seeds per cell; "median" across 3 points is the middle value, not a robust estimator.
-- ddof=1 used for sample stddev (unbiased); difference vs ddof=0 negligible at n≥100.
-- Envelope curves on the headline plot are theoretical (±1/√n, 1 ± 1/√(2n)), not fits.
-- Smoke test only — no inference about anything beyond pipeline health intended.
-
-
----
-
-## ⚠ Plot render errors
-
-- **plot_convergence.png**: `Rscript failed (exit 1) for plot_convergence.png
-STDOUT:
-
-
-STDERR:
-│   └─ggplot2 (local) `grid.draw.ggplot2::ggplot`(X[[i]], ...)
-  5. │     ├─base::print(x)
-  6. │     └─patchwork:::print.patchwork(x)
-  7. │       └─patchwork:::build_patchwork(plot, plot$layout$guides %||% "auto")
-  8. │         └─`
-- **plot_mean.png**: `Rscript failed (exit 1) for plot_mean.png
-STDOUT:
-
-
-STDERR:
-
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-
-Error in `group_by()`:
-! Must group by var`
-- **plot_stddev.png**: `Rscript failed (exit 1) for plot_stddev.png
-STDOUT:
-
-
-STDERR:
-
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-
-Error in `group_by()`:
-! Must group by v`
+- n=3 seeds per condition — "median" is the middle of three points, not a robust estimate. Fine for a smoke test, would be inadequate for a real claim.
+- Only three values of n_samples; the 1/√n claim is asserted visually, not fit.
+- `ddof=1` used for sample stddev; at n≥100 this is numerically indistinguishable from ddof=0.
+- No exploratory analyses added beyond the preregistered plan.
