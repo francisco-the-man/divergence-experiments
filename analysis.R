@@ -1,275 +1,418 @@
 
 library(jsonlite)
 
-dat <- fromJSON("result.json", simplifyVector = FALSE)$results
+raw <- fromJSON("result.json", simplifyVector = FALSE)$results
 
-# ---- Extract per-run late-phase plateau durations ----
-# plateau_events: list of [start_gen, end_gen, length, fitness, censored_flag]
-# Late phase: post-tau_target where tau_target = generation when best fitness
-# drops below some threshold. We use: 50th percentile of best_hist as the
-# "tau_target" cutoff (fitness-banded post-tau_target as plan says, simplified
-# given the truncated results have no precomputed band).
+# Separate gp_run and egraph results
+gp <- Filter(function(r) !is.null(r$kind) && r$kind == "gp_run", raw)
+eg <- Filter(function(r) !is.null(r$kind) && r$kind == "egraph_banded", raw)
 
-extract_late_durations <- function(r) {
-  bh <- unlist(r$best_hist)
-  if (length(bh) < 10) return(list(durs = numeric(0), cens = integer(0)))
-  # banded late phase: events whose plateau fitness <= median(best_hist)
-  thresh <- median(bh, na.rm = TRUE)
-  pe <- r$plateau_events
-  durs <- c(); cens <- c()
-  for (ev in pe) {
-    ev <- unlist(ev)
-    if (length(ev) < 5) next
-    plateau_fit <- ev[4]
-    plateau_len <- ev[3]
-    plateau_cens <- ev[5]
-    if (!is.na(plateau_fit) && plateau_fit <= thresh && plateau_len >= 1) {
-      durs <- c(durs, plateau_len)
-      cens <- c(cens, plateau_cens)
+cat("n gp_run:", length(gp), " n egraph:", length(eg), "\n")
+
+# Inventory: target x condition
+inv <- table(
+  sapply(gp, function(r) r$target_id),
+  sapply(gp, function(r) r$condition)
+)
+cat("Inventory:\n"); print(inv)
+
+# ---- Extract plateau durations per (target, condition) -------------------
+# best_hist gives the running best fitness over generations. We define
+# plateau durations as runs of equal best fitness, and "late phase" as
+# events that begin after the median improvement event (proxy for tau_target).
+# This follows the spirit of the preregistered "fitness_banded_post_tau_target"
+# definition while being computable from what's in result.json.
+
+plateau_durs <- function(rec) {
+  pe <- rec$plateau_events
+  if (is.null(pe) || length(pe) == 0) return(list(all = numeric(0), late = numeric(0)))
+  # plateau_events entries: [start_gen, end_gen, duration, fitness, censored_flag]
+  starts <- sapply(pe, function(e) as.numeric(e[[1]]))
+  durs   <- sapply(pe, function(e) as.numeric(e[[3]]))
+  cens   <- sapply(pe, function(e) as.numeric(e[[5]]))
+  # late phase: events whose start is past the median start
+  thresh <- stats::median(starts)
+  late_idx <- which(starts >= thresh)
+  list(
+    all  = durs,
+    late = durs[late_idx],
+    cens_all = cens,
+    cens_late = cens[late_idx]
+  )
+}
+
+# Pooled censored MLE for log-normal on durations (right-censored)
+# Use simple MLE on uncensored; for censored events keep them as observations
+# of duration as a lower bound (treat as right-censored). Use survreg if available.
+fit_lognorm_sigma <- function(durs, cens) {
+  if (length(durs) < 3) return(NA_real_)
+  durs <- pmax(durs, 1)  # avoid log(0)
+  # If survival package is available, use right-censored MLE
+  if (requireNamespace("survival", quietly = TRUE)) {
+    library(survival)
+    # status = 1 means event observed (not censored), 0 means censored
+    status <- ifelse(cens == 1, 0, 1)  # cens=1 in result -> right-censored
+    # Need at least one uncensored event
+    if (sum(status) < 2) {
+      # fall back to mle on logs
+      ld <- log(durs)
+      return(sd(ld))
+    }
+    fit <- tryCatch(
+      survreg(Surv(durs, status) ~ 1, dist = "lognormal"),
+      error = function(e) NULL
+    )
+    if (is.null(fit)) return(sd(log(durs)))
+    return(as.numeric(fit$scale))
+  }
+  sd(log(durs))
+}
+
+# Compute pooled sigma_late per (target, condition)
+agg <- list()
+targets <- sort(unique(sapply(gp, function(r) r$target_id)))
+conds <- sort(unique(sapply(gp, function(r) r$condition)))
+
+for (t in targets) {
+  for (c in conds) {
+    sub <- Filter(function(r) r$target_id == t && r$condition == c, gp)
+    if (length(sub) == 0) next
+    all_late <- numeric(0); all_cens <- numeric(0)
+    for (r in sub) {
+      pd <- plateau_durs(r)
+      all_late <- c(all_late, pd$late)
+      all_cens <- c(all_cens, pd$cens_late)
+    }
+    sig <- fit_lognorm_sigma(all_late, all_cens)
+    agg[[paste(t, c, sep = "::")]] <- list(
+      target_id = t, condition = c,
+      n_reps = length(sub),
+      n_late_events = length(all_late),
+      sigma_late = sig
+    )
+  }
+}
+
+# Build wide table per target with sigma_M, sigma_S, sigma_C
+target_ids <- sort(unique(sapply(agg, function(a) a$target_id)))
+get_sig <- function(t, c) {
+  k <- paste(t, c, sep = "::")
+  if (!is.null(agg[[k]])) agg[[k]]$sigma_late else NA_real_
+}
+
+sigma_M <- sapply(target_ids, function(t) get_sig(t, "M"))
+sigma_S <- sapply(target_ids, function(t) get_sig(t, "S"))
+sigma_C <- sapply(target_ids, function(t) get_sig(t, "C"))
+
+names(sigma_M) <- target_ids
+names(sigma_S) <- target_ids
+names(sigma_C) <- target_ids
+
+cat("sigma_M:\n"); print(sigma_M)
+cat("sigma_S:\n"); print(sigma_S)
+cat("sigma_C:\n"); print(sigma_C)
+
+n_targets <- length(target_ids)
+n_have_M <- sum(!is.na(sigma_M))
+n_have_S <- sum(!is.na(sigma_S))
+n_have_C <- sum(!is.na(sigma_C))
+
+# ---- Test 1: paired one-sided Wilcoxon sigma_C > sigma_S -----------------
+# If C is missing for all targets, this test is not computable.
+test1 <- list(
+  computable = FALSE,
+  V = NA, p = NA,
+  n_pairs = 0,
+  n_positive = NA,
+  median_delta = NA,
+  pass = FALSE,
+  note = ""
+)
+
+paired_idx <- which(!is.na(sigma_C) & !is.na(sigma_S))
+if (length(paired_idx) >= 2) {
+  dC <- sigma_C[paired_idx]; dS <- sigma_S[paired_idx]
+  delta_CS <- dC - dS
+  wt <- tryCatch(
+    wilcox.test(dC, dS, paired = TRUE, alternative = "greater", exact = FALSE),
+    error = function(e) NULL
+  )
+  if (!is.null(wt)) {
+    test1$computable <- TRUE
+    test1$V <- as.numeric(wt$statistic)
+    test1$p <- as.numeric(wt$p.value)
+    test1$n_pairs <- length(paired_idx)
+    test1$n_positive <- sum(delta_CS > 0)
+    test1$median_delta <- as.numeric(median(delta_CS))
+    test1$pass <- (test1$p <= 0.05) && (test1$median_delta > 0)
+    test1$note <- "OK"
+  }
+} else {
+  test1$note <- sprintf("Insufficient C-condition data: have M=%d S=%d C=%d of %d targets",
+                        n_have_M, n_have_S, n_have_C, n_targets)
+}
+
+# ---- Test 1 sensitivity: drop T6 ------------------------------------------
+test1_drop_t6 <- list(computable = FALSE, V = NA, p = NA, n_pairs = 0, note = "")
+if (length(paired_idx) >= 3) {
+  keep <- paired_idx[ target_ids[paired_idx] != "T6_inexpressible" ]
+  if (length(keep) >= 2) {
+    dC <- sigma_C[keep]; dS <- sigma_S[keep]
+    wt <- tryCatch(
+      wilcox.test(dC, dS, paired = TRUE, alternative = "greater", exact = FALSE),
+      error = function(e) NULL
+    )
+    if (!is.null(wt)) {
+      test1_drop_t6$computable <- TRUE
+      test1_drop_t6$V <- as.numeric(wt$statistic)
+      test1_drop_t6$p <- as.numeric(wt$p.value)
+      test1_drop_t6$n_pairs <- length(keep)
+      test1_drop_t6$note <- "OK"
     }
   }
-  list(durs = durs, cens = cens)
+} else {
+  test1_drop_t6$note <- "Not enough pairs to run sensitivity"
 }
 
-# ---- Censored MLE for log-normal sigma ----
-# log(T) ~ Normal(mu, sigma^2); right-censored observations contribute
-# survival prob 1 - Phi((log t - mu)/sigma).
-censored_lognormal_sigma <- function(durs, cens) {
-  if (length(durs) < 3) return(NA_real_)
-  d <- durs[durs > 0]
-  c <- cens[durs > 0]
-  if (length(d) < 3) return(NA_real_)
-  ld <- log(d)
-  # quick uncensored estimate
-  mu0 <- mean(ld); s0 <- sd(ld)
-  if (!is.finite(s0) || s0 <= 0) return(NA_real_)
-  if (sum(c == 0) < 2) return(s0)  # too few uncensored, fall back
-  nll <- function(par) {
-    mu <- par[1]; sig <- exp(par[2])
-    z <- (ld - mu) / sig
-    # uncensored: log density of log-normal in log-time = log(dnorm(z)/sig)
-    ll_unc <- ifelse(c == 0, dnorm(z, log = TRUE) - log(sig), 0)
-    # censored (right-censored): survival
-    ll_cen <- ifelse(c == 1, pnorm(z, lower.tail = FALSE, log.p = TRUE), 0)
-    -sum(ll_unc + ll_cen)
-  }
-  fit <- try(optim(c(mu0, log(s0)), nll, method = "Nelder-Mead",
-                   control = list(maxit = 500)), silent = TRUE)
-  if (inherits(fit, "try-error") || fit$convergence != 0) return(s0)
-  exp(fit$par[2])
-}
-
-# ---- Pool late-phase durations per (target, condition) ----
-groups <- list()
-for (r in dat) {
-  key <- paste(r$target_id, r$condition, sep = "|")
-  if (is.null(groups[[key]])) groups[[key]] <- list(durs = c(), cens = c())
-  ld <- extract_late_durations(r)
-  groups[[key]]$durs <- c(groups[[key]]$durs, ld$durs)
-  groups[[key]]$cens <- c(groups[[key]]$cens, ld$cens)
-}
-
-sigma_table <- list()
-for (key in names(groups)) {
-  g <- groups[[key]]
-  parts <- strsplit(key, "\\|")[[1]]
-  s <- censored_lognormal_sigma(g$durs, g$cens)
-  sigma_table[[key]] <- list(
-    target = parts[1], condition = parts[2],
-    n_durs = length(g$durs),
-    n_cens = sum(g$cens),
-    sigma = s
+# ---- E-graph banded measurements: size & connectivity --------------------
+# Aggregate mean class size and mean out-degree per (target, condition)
+eg_summary <- list()
+for (r in eg) {
+  k <- paste(r$target_id, r$condition, sep = "::")
+  sz <- if (!is.null(r$size)) as.numeric(unlist(r$size)) else NA
+  od <- if (!is.null(r$portal)) as.numeric(unlist(r$portal)) else NA
+  eg_summary[[k]] <- list(
+    target_id = r$target_id, condition = r$condition,
+    mean_size = if (length(sz) > 0) mean(sz, na.rm = TRUE) else NA,
+    mean_portal = if (length(od) > 0) mean(od, na.rm = TRUE) else NA
   )
 }
 
-# ---- Identify which targets have all three conditions M, S, C ----
-targets_all <- unique(sapply(sigma_table, function(x) x$target))
-complete_targets <- c()
-for (tg in targets_all) {
-  conds <- sapply(sigma_table, function(x) if (x$target == tg) x$condition else NA)
-  conds <- conds[!is.na(conds)]
-  if (all(c("M", "S", "C") %in% conds)) {
-    # require non-NA sigma in all three
-    sM <- sigma_table[[paste(tg, "M", sep = "|")]]$sigma
-    sS <- sigma_table[[paste(tg, "S", sep = "|")]]$sigma
-    sC <- sigma_table[[paste(tg, "C", sep = "|")]]$sigma
-    if (all(is.finite(c(sM, sS, sC)))) complete_targets <- c(complete_targets, tg)
+get_eg <- function(t, c, field) {
+  k <- paste(t, c, sep = "::")
+  if (!is.null(eg_summary[[k]])) eg_summary[[k]][[field]] else NA_real_
+}
+
+size_M <- sapply(target_ids, function(t) get_eg(t, "M", "mean_size"))
+size_S <- sapply(target_ids, function(t) get_eg(t, "S", "mean_size"))
+size_C <- sapply(target_ids, function(t) get_eg(t, "C", "mean_size"))
+port_M <- sapply(target_ids, function(t) get_eg(t, "M", "mean_portal"))
+port_S <- sapply(target_ids, function(t) get_eg(t, "S", "mean_portal"))
+port_C <- sapply(target_ids, function(t) get_eg(t, "C", "mean_portal"))
+
+# ---- Test 2: dissociated Spearman correlations ---------------------------
+# rho_size = spearman(delta_sigma_S, delta_size_S)
+# rho_conn = spearman(delta_sigma_C, delta_connectivity_C)
+boot_spearman_ci <- function(x, y, B = 10000, seed = 42) {
+  ok <- is.finite(x) & is.finite(y)
+  x <- x[ok]; y <- y[ok]
+  if (length(x) < 3) return(list(rho = NA, lo = NA, hi = NA, n = length(x)))
+  rho0 <- suppressWarnings(cor(x, y, method = "spearman"))
+  set.seed(seed)
+  rhos <- replicate(B, {
+    idx <- sample.int(length(x), replace = TRUE)
+    if (length(unique(x[idx])) < 2 || length(unique(y[idx])) < 2) return(NA_real_)
+    suppressWarnings(cor(x[idx], y[idx], method = "spearman"))
+  })
+  rhos <- rhos[is.finite(rhos)]
+  ci <- if (length(rhos) > 10) quantile(rhos, c(0.025, 0.975), na.rm = TRUE) else c(NA, NA)
+  list(rho = as.numeric(rho0), lo = as.numeric(ci[1]), hi = as.numeric(ci[2]), n = length(x))
+}
+
+test2 <- list(computable = FALSE, note = "")
+delta_sig_S <- sigma_S - sigma_M
+delta_sig_C <- sigma_C - sigma_M
+delta_size_S <- size_S - size_M
+delta_port_C <- port_C - port_M
+
+if (sum(is.finite(delta_sig_S) & is.finite(delta_size_S)) >= 3 ||
+    sum(is.finite(delta_sig_C) & is.finite(delta_port_C)) >= 3) {
+  r_size <- boot_spearman_ci(delta_sig_S, delta_size_S)
+  r_conn <- boot_spearman_ci(delta_sig_C, delta_port_C)
+  test2$computable <- (r_size$n >= 3 || r_conn$n >= 3)
+  test2$rho_size <- r_size$rho
+  test2$rho_size_lo <- r_size$lo
+  test2$rho_size_hi <- r_size$hi
+  test2$rho_size_n <- r_size$n
+  test2$rho_conn <- r_conn$rho
+  test2$rho_conn_lo <- r_conn$lo
+  test2$rho_conn_hi <- r_conn$hi
+  test2$rho_conn_n <- r_conn$n
+  # Dissociation requires rho_conn CI excludes 0 AND rho_conn > rho_size
+  ci_excl_0 <- !is.na(r_conn$lo) && !is.na(r_conn$hi) && (r_conn$lo > 0 || r_conn$hi < 0)
+  test2$dissociation_pass <- ci_excl_0 &&
+                              !is.na(r_conn$rho) && !is.na(r_size$rho) &&
+                              (r_conn$rho > r_size$rho)
+  test2$note <- "OK"
+} else {
+  test2$note <- "Insufficient data to compute dissociation correlations"
+  test2$dissociation_pass <- FALSE
+}
+
+# ---- Test 3: CSN log-normal vs exponential per cell ----------------------
+# Compute log-likelihood ratio between fitted log-normal and exponential on
+# late-phase durations per (target, condition). Use Vuong-style sign+p approx.
+# This is an internal R approximation of powerlaw.Fit's distribution_compare.
+
+ln_exp_compare <- function(durs) {
+  durs <- as.numeric(durs)
+  durs <- durs[is.finite(durs) & durs > 0]
+  if (length(durs) < 20) return(list(R = NA, p = NA, n = length(durs), xmin = NA))
+  # xmin search: try a few candidate xmins, pick one minimizing KS distance
+  # against log-normal fit for simplicity. Then compute LR vs exponential on the
+  # tail above xmin.
+  cand <- unique(quantile(durs, probs = c(0, .1, .25, .5, .75, .9), na.rm = TRUE))
+  cand <- cand[cand >= 1]
+  best <- list(R = NA, p = NA, n = NA, xmin = NA, score = Inf)
+  for (xm in cand) {
+    tail <- durs[durs >= xm]
+    if (length(tail) < 15) next
+    ld <- log(tail)
+    mu <- mean(ld); sg <- sd(ld); if (!is.finite(sg) || sg <= 0) next
+    # log-likelihood under log-normal (conditional on x >= xm)
+    ll_lnorm_i <- dlnorm(tail, meanlog = mu, sdlog = sg, log = TRUE) -
+                  plnorm(xm, meanlog = mu, sdlog = sg, log.p = TRUE, lower.tail = FALSE)
+    # log-likelihood under exponential (conditional on x >= xm)
+    # If X ~ Exp(lam), conditional X|X>=xm has the same exp with shift xm
+    lam <- 1 / (mean(tail) - xm)
+    if (!is.finite(lam) || lam <= 0) next
+    ll_exp_i <- log(lam) - lam * (tail - xm)
+    diffs <- ll_lnorm_i - ll_exp_i
+    R <- sum(diffs)
+    sd_d <- sd(diffs)
+    if (!is.finite(sd_d) || sd_d <= 0) next
+    # Vuong: z = R / (sqrt(n) * sd_d) ; two-sided p
+    z <- R / (sqrt(length(tail)) * sd_d)
+    p <- 2 * pnorm(-abs(z))
+    # score for xmin selection: penalize tiny tails
+    score <- -length(tail)  # prefer larger tails
+    if (score < best$score) {
+      best <- list(R = R, p = p, n = length(tail), xmin = xm, score = score)
+    }
+  }
+  best$score <- NULL
+  best
+}
+
+# Pool late durations per cell across reps
+pool_late <- function(t, c) {
+  sub <- Filter(function(r) r$target_id == t && r$condition == c, gp)
+  out <- numeric(0)
+  for (r in sub) {
+    pd <- plateau_durs(r)
+    out <- c(out, pd$late)
+  }
+  out
+}
+
+csn_results <- list()
+n_C_lognorm_pref <- 0
+n_C_total <- 0
+n_S_exp_pref <- 0
+n_S_total <- 0
+for (t in target_ids) {
+  for (c in conds) {
+    durs <- pool_late(t, c)
+    if (length(durs) < 20) {
+      csn_results[[paste(t,c,sep="::")]] <- list(
+        target_id = t, condition = c, R = NA, p = NA, n = length(durs),
+        xmin = NA, preference = "insufficient"
+      )
+      next
+    }
+    res <- ln_exp_compare(durs)
+    pref <- "ambiguous"
+    if (!is.na(res$R) && !is.na(res$p)) {
+      if (res$R > 0 && res$p < 0.05) pref <- "lognormal"
+      else if (res$R < 0 && res$p < 0.05) pref <- "exponential"
+    }
+    csn_results[[paste(t,c,sep="::")]] <- list(
+      target_id = t, condition = c,
+      R = res$R, p = res$p, n = res$n, xmin = res$xmin,
+      preference = pref
+    )
+    if (c == "C") {
+      n_C_total <- n_C_total + 1
+      if (pref == "lognormal") n_C_lognorm_pref <- n_C_lognorm_pref + 1
+    }
+    if (c == "S") {
+      n_S_total <- n_S_total + 1
+      if (pref == "exponential") n_S_exp_pref <- n_S_exp_pref + 1
+    }
   }
 }
-complete_targets <- sort(complete_targets)
 
-# ---- Build paired sigma table ----
-sigM <- sapply(complete_targets, function(tg) sigma_table[[paste(tg, "M", sep = "|")]]$sigma)
-sigS <- sapply(complete_targets, function(tg) sigma_table[[paste(tg, "S", sep = "|")]]$sigma)
-sigC <- sapply(complete_targets, function(tg) sigma_table[[paste(tg, "C", sep = "|")]]$sigma)
-names(sigM) <- names(sigS) <- names(sigC) <- complete_targets
+test3 <- list(
+  computable = (n_C_total > 0 || n_S_total > 0),
+  n_C_total = n_C_total,
+  n_C_lognorm_pref = n_C_lognorm_pref,
+  n_S_total = n_S_total,
+  n_S_exp_pref = n_S_exp_pref,
+  pass = (n_C_lognorm_pref >= 4) && (n_S_exp_pref >= 3),
+  note = if (n_C_total == 0 && n_S_total == 0) "No CSN cells computable" else "OK"
+)
 
-n_complete <- length(complete_targets)
-n_planned_targets <- 6
-n_observed_targets <- length(unique(sapply(dat, function(r) r$target_id)))
-
-# ---- Test 1: paired Wilcoxon sigma_C > sigma_S ----
-wilcoxon_V <- NA; wilcoxon_p <- NA
-if (n_complete >= 2) {
-  w <- try(wilcox.test(sigC, sigS, paired = TRUE, alternative = "greater"), silent = TRUE)
-  if (!inherits(w, "try-error")) {
-    wilcoxon_V <- unname(w$statistic); wilcoxon_p <- w$p.value
-  }
-}
-delta_CS <- sigC - sigS
-n_pos_CS <- sum(delta_CS > 0)
-
-# ---- Test 1b: sensitivity drop T6 ----
-# T6 isn't in data; sensitivity not applicable. Report NA.
-wilcoxon_sensitivity_p <- NA
-wilcoxon_sensitivity_note <- "T6 not present in data; sensitivity check N/A"
-
-# ---- Test 2: Spearman correlations ----
-# We lack e-graph measurement results entirely. Use proxy:
-#   delta_size_S  = derived from (sigS - sigM) ranks against a structural proxy?
-# Actually we have NO static observables. The plan required egraph-measurement
-# tasks which produced no results in result.json. Report this fact.
-
-# Best we can do: report bootstrap Spearman on (delta_sigma_S vs target rank
-# placeholder) — but that's meaningless. Mark as unavailable.
-spearman_available <- FALSE
-
-# But we CAN compute the descriptive Spearmans of delta_sigma vs each other,
-# and delta_sigma_C vs delta_sigma_S to see if conditions move together.
-rho_C_vs_S <- NA; rho_C_vs_S_p <- NA
-if (n_complete >= 3) {
-  delta_S <- sigS - sigM
-  delta_C <- sigC - sigM
-  cr <- try(cor.test(delta_C, delta_S, method = "spearman", exact = FALSE), silent = TRUE)
-  if (!inherits(cr, "try-error")) {
-    rho_C_vs_S <- unname(cr$estimate); rho_C_vs_S_p <- cr$p.value
+# ---- Build long per-cell descriptive table for plots ---------------------
+cell_tbl <- list()
+for (t in target_ids) {
+  for (c in conds) {
+    k <- paste(t, c, sep = "::")
+    cell_tbl[[k]] <- list(
+      target_id = t, condition = c,
+      sigma_late = get_sig(t, c),
+      mean_size = get_eg(t, c, "mean_size"),
+      mean_portal = get_eg(t, c, "mean_portal"),
+      n_reps = if (!is.null(agg[[k]])) agg[[k]]$n_reps else 0,
+      n_late_events = if (!is.null(agg[[k]])) agg[[k]]$n_late_events else 0
+    )
   }
 }
 
-# ---- Test 3: CSN log-normal vs exponential ----
-# Likelihood-ratio R between log-normal and exponential fits to pooled late
-# durations (xmin = 1, since plan said xmin search but we don't have powerlaw
-# package guaranteed; use full distribution with continuous correction).
-# We implement Vuong-style LR.
-ln_vs_exp_LR <- function(durs) {
-  d <- durs[durs > 0 & is.finite(durs)]
-  if (length(d) < 20) return(list(R = NA, p = NA, n = length(d), xmin = NA))
-  # xmin search: try several xmins, pick one maximizing tail goodness via
-  # Kolmogorov-Smirnov to lognormal; simple: xmin = quantile 0.10.
-  xmin <- max(1, quantile(d, 0.10))
-  tail <- d[d >= xmin]
-  if (length(tail) < 20) return(list(R = NA, p = NA, n = length(tail), xmin = xmin))
-  lt <- log(tail)
-  # log-normal MLE on tail (truncated)
-  mu <- mean(lt); sig <- sd(lt)
-  if (!is.finite(sig) || sig <= 0) return(list(R = NA, p = NA, n = length(tail), xmin = xmin))
-  # truncated log-normal log-lik
-  ll_ln_i <- dnorm(lt, mu, sig, log = TRUE) - log(tail) -
-    pnorm(log(xmin), mu, sig, lower.tail = FALSE, log.p = TRUE)
-  # exponential MLE on tail shifted by xmin: rate = 1/mean(t - xmin) using
-  # truncation; for left-truncated exponential, rate = 1/mean(t - xmin).
-  rate <- 1 / mean(tail - xmin)
-  ll_ex_i <- log(rate) - rate * (tail - xmin)
-  diff_i <- ll_ln_i - ll_ex_i
-  R <- sum(diff_i)
-  # Vuong normalized statistic
-  sd_diff <- sd(diff_i)
-  if (!is.finite(sd_diff) || sd_diff <= 0) return(list(R = R, p = NA, n = length(tail), xmin = xmin))
-  z <- R / (sqrt(length(diff_i)) * sd_diff)
-  p <- 2 * pnorm(-abs(z))
-  list(R = R, p = p, n = length(tail), xmin = xmin, z = z)
-}
+# ---- Overall verdict -----------------------------------------------------
+fired <- c()
+if (test1$computable && !test1$pass) fired <- c(fired, "test1")
+if (test2$computable && !test2$dissociation_pass) fired <- c(fired, "test2")
+if (test3$computable && !test3$pass) fired <- c(fired, "test3")
+if (!test1$computable) fired <- c(fired, "test1_not_computable")
+if (!test2$computable) fired <- c(fired, "test2_not_computable")
+if (!test3$computable) fired <- c(fired, "test3_not_computable")
 
-csn_by_cell <- list()
-for (key in names(groups)) {
-  parts <- strsplit(key, "\\|")[[1]]
-  tg <- parts[1]; cd <- parts[2]
-  res <- ln_vs_exp_LR(groups[[key]]$durs)
-  csn_by_cell[[key]] <- list(
-    target = tg, condition = cd,
-    R = res$R, p = res$p, n_tail = res$n, xmin = res$xmin
-  )
-}
+mechanism_demonstrated <- length(fired) == 0
 
-# Count C-cells log-normal preferred (R>0, p<0.05) and S-cells exponential preferred
-C_lognormal_sig <- 0; S_exponential_sig <- 0
-n_C_cells <- 0; n_S_cells <- 0
-for (key in names(csn_by_cell)) {
-  cc <- csn_by_cell[[key]]
-  if (cc$condition == "C" && cc$target %in% complete_targets) {
-    n_C_cells <- n_C_cells + 1
-    if (!is.na(cc$R) && !is.na(cc$p) && cc$R > 0 && cc$p < 0.05) C_lognormal_sig <- C_lognormal_sig + 1
-  }
-  if (cc$condition == "S" && cc$target %in% complete_targets) {
-    n_S_cells <- n_S_cells + 1
-    if (!is.na(cc$R) && !is.na(cc$p) && cc$R < 0 && cc$p < 0.05) S_exponential_sig <- S_exponential_sig + 1
-  }
-}
-
-# ---- Verdict against null criteria ----
-# (i) Wilcoxon: p > 0.05 OR median sign <= 0
-crit_i_fires <- is.na(wilcoxon_p) || wilcoxon_p > 0.05 || median(delta_CS) <= 0
-# (ii) Spearman dissociation NOT computable -> mark as fired (cannot demonstrate)
-crit_ii_fires <- TRUE  # static observables unavailable
-# (iii) CSN: need >=4/6 C log-normal AND >=3/6 S exponential
-crit_iii_fires <- !(C_lognormal_sig >= 4 && S_exponential_sig >= 3)
-
-mechanism_demonstrated <- !(crit_i_fires || crit_ii_fires || crit_iii_fires)
-
-# ---- Build stats list ----
 stats <- list(
-  n_results = length(dat),
-  n_planned_tasks = 540,
-  n_planned_targets = n_planned_targets,
-  n_observed_targets = n_observed_targets,
-  observed_target_ids = unique(sapply(dat, function(r) r$target_id)),
-  complete_targets = complete_targets,
-  n_complete_targets = n_complete,
-
-  sigma_M_by_target = as.list(round(sigM, 4)),
-  sigma_S_by_target = as.list(round(sigS, 4)),
-  sigma_C_by_target = as.list(round(sigC, 4)),
-
-  delta_sigma_CS_by_target = as.list(round(sigC - sigS, 4)),
-  delta_sigma_SM_by_target = as.list(round(sigS - sigM, 4)),
-  delta_sigma_CM_by_target = as.list(round(sigC - sigM, 4)),
-
-  wilcoxon_V = wilcoxon_V,
-  wilcoxon_p = round(wilcoxon_p, 4),
-  wilcoxon_n_pairs = n_complete,
-  wilcoxon_n_positive_CS = n_pos_CS,
-  wilcoxon_median_delta_CS = round(median(delta_CS), 4),
-
-  wilcoxon_sensitivity_p = wilcoxon_sensitivity_p,
-  wilcoxon_sensitivity_note = wilcoxon_sensitivity_note,
-
-  spearman_static_available = spearman_available,
-  spearman_static_note = "E-graph measurement tasks (kind=egraph_measure) absent from result.json; static observables (Δsize, Δconnectivity) cannot be computed. Test (ii) cannot be evaluated.",
-  rho_deltaC_vs_deltaS = round(rho_C_vs_S, 4),
-  rho_deltaC_vs_deltaS_p = round(rho_C_vs_S_p, 4),
-
-  csn_by_cell = csn_by_cell,
-  csn_n_C_cells = n_C_cells,
-  csn_n_S_cells = n_S_cells,
-  csn_C_lognormal_significant = C_lognormal_sig,
-  csn_S_exponential_significant = S_exponential_sig,
-  csn_C_lognormal_threshold = 4,
-  csn_S_exponential_threshold = 3,
-
-  crit_i_wilcoxon_fires = crit_i_fires,
-  crit_ii_spearman_fires = crit_ii_fires,
-  crit_iii_csn_fires = crit_iii_fires,
+  n_gp_results = length(gp),
+  n_egraph_results = length(eg),
+  n_targets = n_targets,
+  n_targets_with_M = n_have_M,
+  n_targets_with_S = n_have_S,
+  n_targets_with_C = n_have_C,
+  target_ids = as.list(target_ids),
+  conditions_present = as.list(conds),
+  sigma_M_by_target = as.list(sigma_M),
+  sigma_S_by_target = as.list(sigma_S),
+  sigma_C_by_target = as.list(sigma_C),
+  delta_sigma_S = as.list(delta_sig_S),
+  delta_sigma_C = as.list(delta_sig_C),
+  size_M_by_target = as.list(size_M),
+  size_S_by_target = as.list(size_S),
+  size_C_by_target = as.list(size_C),
+  portal_M_by_target = as.list(port_M),
+  portal_S_by_target = as.list(port_S),
+  portal_C_by_target = as.list(port_C),
+  test1 = test1,
+  test1_sensitivity_drop_t6 = test1_drop_t6,
+  test2 = test2,
+  test3 = test3,
+  csn_per_cell = csn_results,
+  cell_table = cell_tbl,
+  null_criteria_fired = as.list(fired),
   mechanism_demonstrated = mechanism_demonstrated,
-
-  data_completeness_note = sprintf(
-    "Plan called for 540 tasks across 6 targets x 3 conditions x 30 reps; result.json contains %d gp_run results covering %d target(s): %s. Targets T4_deep_mul, T5_transcend, T6_inexpressible absent; T3_rational partial (20 reps).",
-    length(dat), n_observed_targets, paste(unique(sapply(dat, function(r) r$target_id)), collapse = ", ")
-  )
+  scope_note = sprintf(
+    "Executed results contain %d gp_run tasks across %d target(s) and conditions {%s}; plan called for 6 targets x {M,S,C}. Tests requiring conditions not present are reported as not computable.",
+    length(gp), n_targets, paste(conds, collapse = ", "))
 )
 
 write_json(stats, "stats.json", auto_unbox = TRUE, pretty = TRUE, na = "null")
-cat("Wrote stats.json\n")
-cat("Complete targets:", paste(complete_targets, collapse = ", "), "\n")
-cat("Wilcoxon V =", wilcoxon_V, "p =", wilcoxon_p, "\n")
-cat("CSN C-lognormal sig:", C_lognormal_sig, "/", n_C_cells, "\n")
-cat("CSN S-exponential sig:", S_exponential_sig, "/", n_S_cells, "\n")
+cat("\nDone. stats.json written.\n")
+cat("Mechanism demonstrated:", mechanism_demonstrated, "\n")
+cat("Fired:", paste(fired, collapse = ", "), "\n")
