@@ -1,219 +1,482 @@
 {
-  "n_results": 540,
-  "n_planned_tasks": 540,
-  "n_planned_targets": 6,
-  "n_observed_targets": 6,
-  "observed_target_ids": ["T1_poly_sep", "T2_coupled", "T3_rational", "T4_deep_mul", "T5_transcend", "T6_inexpressible"],
-  "complete_targets": ["T2_coupled", "T3_rational", "T4_deep_mul", "T5_transcend", "T6_inexpressible"],
-  "n_complete_targets": 5,
+  "n_gp_results": 2160,
+  "n_egraph_results": 18,
+  "n_targets": 6,
+  "n_targets_with_M": 6,
+  "n_targets_with_S": 6,
+  "n_targets_with_C": 6,
+  "target_ids": [
+    "T1_poly_sep",
+    "T2_coupled",
+    "T3_rational",
+    "T4_deep_mul",
+    "T5_transcend",
+    "T6_inexpressible"
+  ],
+  "conditions_present": [
+    "C",
+    "M",
+    "S"
+  ],
   "sigma_M_by_target": {
-    "T2_coupled": 0.0014,
-    "T3_rational": 0.6278,
-    "T4_deep_mul": 0.286,
-    "T5_transcend": 0.0024,
-    "T6_inexpressible": 0.0216
+    "T1_poly_sep": 0.0249,
+    "T2_coupled": 0.004,
+    "T3_rational": 0.6355,
+    "T4_deep_mul": 0.3997,
+    "T5_transcend": 0.0709,
+    "T6_inexpressible": 0.0429
   },
   "sigma_S_by_target": {
-    "T2_coupled": 0.0019,
-    "T3_rational": 0.2626,
-    "T4_deep_mul": 0.3133,
-    "T5_transcend": 0.0126,
-    "T6_inexpressible": 0.0046
+    "T1_poly_sep": 0.0579,
+    "T2_coupled": 0.0095,
+    "T3_rational": 0.4671,
+    "T4_deep_mul": 0.3052,
+    "T5_transcend": 0.1929,
+    "T6_inexpressible": 0.0086
   },
   "sigma_C_by_target": {
-    "T2_coupled": 1.8681,
-    "T3_rational": 0.9033,
-    "T4_deep_mul": 1.2162,
-    "T5_transcend": 1.3179,
-    "T6_inexpressible": 1.6524
+    "T1_poly_sep": 1.6038,
+    "T2_coupled": 1.4706,
+    "T3_rational": 1.151,
+    "T4_deep_mul": 1.3389,
+    "T5_transcend": 1.3223,
+    "T6_inexpressible": 1.4138
   },
-  "delta_sigma_CS_by_target": {
-    "T2_coupled": 1.8662,
-    "T3_rational": 0.6407,
-    "T4_deep_mul": 0.9028,
-    "T5_transcend": 1.3053,
-    "T6_inexpressible": 1.6479
+  "delta_sigma_S": {
+    "T1_poly_sep": 0.0329,
+    "T2_coupled": 0.0055,
+    "T3_rational": -0.1684,
+    "T4_deep_mul": -0.0945,
+    "T5_transcend": 0.122,
+    "T6_inexpressible": -0.0343
   },
-  "delta_sigma_SM_by_target": {
-    "T2_coupled": 0.0005,
-    "T3_rational": -0.3652,
-    "T4_deep_mul": 0.0274,
-    "T5_transcend": 0.0102,
-    "T6_inexpressible": -0.017
+  "delta_sigma_C": {
+    "T1_poly_sep": 1.5789,
+    "T2_coupled": 1.4666,
+    "T3_rational": 0.5155,
+    "T4_deep_mul": 0.9393,
+    "T5_transcend": 1.2514,
+    "T6_inexpressible": 1.3709
   },
-  "delta_sigma_CM_by_target": {
-    "T2_coupled": 1.8667,
-    "T3_rational": 0.2755,
-    "T4_deep_mul": 0.9302,
-    "T5_transcend": 1.3155,
-    "T6_inexpressible": 1.6309
+  "size_M_by_target": {
+    "T1_poly_sep": 7.7167,
+    "T2_coupled": 7.9786,
+    "T3_rational": 16.7116,
+    "T4_deep_mul": 7.2955,
+    "T5_transcend": 18.5452,
+    "T6_inexpressible": 7.9249
   },
-  "wilcoxon_V": 15,
-  "wilcoxon_p": 0.0312,
-  "wilcoxon_n_pairs": 5,
-  "wilcoxon_n_positive_CS": 5,
-  "wilcoxon_median_delta_CS": 1.3053,
-  "wilcoxon_sensitivity_p": null,
-  "wilcoxon_sensitivity_note": "T6 not present in data; sensitivity check N/A",
-  "spearman_static_available": false,
-  "spearman_static_note": "E-graph measurement tasks (kind=egraph_measure) absent from result.json; static observables (Δsize, Δconnectivity) cannot be computed. Test (ii) cannot be evaluated.",
-  "rho_deltaC_vs_deltaS": 0.1,
-  "rho_deltaC_vs_deltaS_p": 0.8729,
-  "csn_by_cell": {
-    "T1_poly_sep|M": {
-      "target": "T1_poly_sep",
-      "condition": "M",
-      "R": null,
-      "p": null,
-      "n_tail": 2,
-      "xmin": null
-    },
-    "T1_poly_sep|S": {
-      "target": "T1_poly_sep",
-      "condition": "S",
-      "R": null,
-      "p": null,
-      "n_tail": 1,
-      "xmin": null
-    },
-    "T1_poly_sep|C": {
-      "target": "T1_poly_sep",
+  "size_S_by_target": {
+    "T1_poly_sep": 49.3099,
+    "T2_coupled": 52.6702,
+    "T3_rational": 92.7141,
+    "T4_deep_mul": 54.0073,
+    "T5_transcend": 89.3999,
+    "T6_inexpressible": 51.454
+  },
+  "size_C_by_target": {
+    "T1_poly_sep": 16.1643,
+    "T2_coupled": 16.5977,
+    "T3_rational": 25.8652,
+    "T4_deep_mul": 15.7822,
+    "T5_transcend": 25.519,
+    "T6_inexpressible": 14.6261
+  },
+  "portal_M_by_target": {
+    "T1_poly_sep": 0.2013,
+    "T2_coupled": 0.225,
+    "T3_rational": 0.1725,
+    "T4_deep_mul": 0.2488,
+    "T5_transcend": 0.2162,
+    "T6_inexpressible": 0.1688
+  },
+  "portal_S_by_target": {
+    "T1_poly_sep": 0.32,
+    "T2_coupled": 0.3312,
+    "T3_rational": 0.27,
+    "T4_deep_mul": 0.2875,
+    "T5_transcend": 0.3125,
+    "T6_inexpressible": 0.2988
+  },
+  "portal_C_by_target": {
+    "T1_poly_sep": 0.3225,
+    "T2_coupled": 0.3012,
+    "T3_rational": 0.3012,
+    "T4_deep_mul": 0.3388,
+    "T5_transcend": 0.3238,
+    "T6_inexpressible": 0.3325
+  },
+  "test1": {
+    "computable": true,
+    "V": 21,
+    "p": 0.018,
+    "n_pairs": 6,
+    "n_positive": 6,
+    "median_delta": 1.2673,
+    "pass": true,
+    "note": "OK"
+  },
+  "test1_sensitivity_drop_t6": {
+    "computable": true,
+    "V": 15,
+    "p": 0.0295,
+    "n_pairs": 5,
+    "note": "OK"
+  },
+  "test2": {
+    "computable": true,
+    "note": "OK",
+    "rho_size": -0.3714,
+    "rho_size_lo": -1,
+    "rho_size_hi": 0.8065,
+    "rho_size_n": 6,
+    "rho_conn": -0.1429,
+    "rho_conn_lo": -1,
+    "rho_conn_hi": 1,
+    "rho_conn_n": 6,
+    "dissociation_pass": false
+  },
+  "test3": {
+    "computable": true,
+    "n_C_total": 6,
+    "n_C_lognorm_pref": 6,
+    "n_S_total": 6,
+    "n_S_exp_pref": 1,
+    "pass": false,
+    "note": "OK"
+  },
+  "csn_per_cell": {
+    "T1_poly_sep::C": {
+      "target_id": "T1_poly_sep",
       "condition": "C",
-      "R": 20.2087,
-      "p": 0.0019,
-      "n_tail": 172,
-      "xmin": 4
+      "R": 717.4106,
+      "p": 5.8858e-69,
+      "n": 1513,
+      "xmin": 1,
+      "preference": "lognormal"
     },
-    "T2_coupled|M": {
-      "target": "T2_coupled",
+    "T1_poly_sep::M": {
+      "target_id": "T1_poly_sep",
       "condition": "M",
-      "R": null,
-      "p": null,
-      "n_tail": 3,
-      "xmin": null
+      "R": 412.0731,
+      "p": 2.6874e-44,
+      "n": 366,
+      "xmin": 1,
+      "preference": "lognormal"
     },
-    "T2_coupled|S": {
-      "target": "T2_coupled",
+    "T1_poly_sep::S": {
+      "target_id": "T1_poly_sep",
       "condition": "S",
-      "R": null,
-      "p": null,
-      "n_tail": 3,
-      "xmin": null
+      "R": 432.82,
+      "p": 1.1044e-49,
+      "n": 396,
+      "xmin": 1,
+      "preference": "lognormal"
     },
-    "T2_coupled|C": {
-      "target": "T2_coupled",
+    "T2_coupled::C": {
+      "target_id": "T2_coupled",
       "condition": "C",
-      "R": 2.468,
-      "p": 0.5698,
-      "n_tail": 137,
-      "xmin": 6.2
+      "R": 667.0963,
+      "p": 2.4715e-62,
+      "n": 1552,
+      "xmin": 1,
+      "preference": "lognormal"
     },
-    "T3_rational|M": {
-      "target": "T3_rational",
+    "T2_coupled::M": {
+      "target_id": "T2_coupled",
       "condition": "M",
-      "R": -2.755,
-      "p": 0.0025,
-      "n_tail": 20,
-      "xmin": 19.4
+      "R": -6.7889,
+      "p": 0.7534,
+      "n": 165,
+      "xmin": 1,
+      "preference": "ambiguous"
     },
-    "T3_rational|S": {
-      "target": "T3_rational",
+    "T2_coupled::S": {
+      "target_id": "T2_coupled",
       "condition": "S",
-      "R": null,
-      "p": null,
-      "n_tail": 19,
-      "xmin": 276.1
+      "R": -17.2207,
+      "p": 0.3656,
+      "n": 165,
+      "xmin": 1,
+      "preference": "ambiguous"
     },
-    "T3_rational|C": {
-      "target": "T3_rational",
+    "T3_rational::C": {
+      "target_id": "T3_rational",
       "condition": "C",
-      "R": 5.1322,
-      "p": 0.1861,
-      "n_tail": 120,
-      "xmin": 9
+      "R": 597.8557,
+      "p": 1.2959e-58,
+      "n": 1563,
+      "xmin": 1,
+      "preference": "lognormal"
     },
-    "T4_deep_mul|M": {
-      "target": "T4_deep_mul",
+    "T3_rational::M": {
+      "target_id": "T3_rational",
       "condition": "M",
-      "R": null,
-      "p": null,
-      "n_tail": 12,
-      "xmin": null
+      "R": -46.6811,
+      "p": 3.2921e-14,
+      "n": 155,
+      "xmin": 2,
+      "preference": "exponential"
     },
-    "T4_deep_mul|S": {
-      "target": "T4_deep_mul",
+    "T3_rational::S": {
+      "target_id": "T3_rational",
       "condition": "S",
-      "R": 8.5658,
-      "p": 0.2947,
-      "n_tail": 27,
-      "xmin": 2
+      "R": 12.2733,
+      "p": 0.546,
+      "n": 124,
+      "xmin": 29,
+      "preference": "ambiguous"
     },
-    "T4_deep_mul|C": {
-      "target": "T4_deep_mul",
+    "T4_deep_mul::C": {
+      "target_id": "T4_deep_mul",
       "condition": "C",
-      "R": 68.7056,
-      "p": 2.7343e-10,
-      "n_tail": 181,
-      "xmin": 3
+      "R": 1394.9728,
+      "p": 4.4081e-118,
+      "n": 2067,
+      "xmin": 1,
+      "preference": "lognormal"
     },
-    "T5_transcend|M": {
-      "target": "T5_transcend",
+    "T4_deep_mul::M": {
+      "target_id": "T4_deep_mul",
       "condition": "M",
-      "R": null,
-      "p": null,
-      "n_tail": 3,
-      "xmin": null
+      "R": 1082.5172,
+      "p": 2.2564e-275,
+      "n": 799,
+      "xmin": 1,
+      "preference": "lognormal"
     },
-    "T5_transcend|S": {
-      "target": "T5_transcend",
+    "T4_deep_mul::S": {
+      "target_id": "T4_deep_mul",
       "condition": "S",
-      "R": null,
-      "p": null,
-      "n_tail": 4,
-      "xmin": null
+      "R": 1249.8257,
+      "p": 5.2674e-281,
+      "n": 989,
+      "xmin": 1,
+      "preference": "lognormal"
     },
-    "T5_transcend|C": {
-      "target": "T5_transcend",
+    "T5_transcend::C": {
+      "target_id": "T5_transcend",
       "condition": "C",
-      "R": 9.9906,
-      "p": 0.143,
-      "n_tail": 170,
-      "xmin": 5
+      "R": 648.2007,
+      "p": 4.4647e-67,
+      "n": 1405,
+      "xmin": 1,
+      "preference": "lognormal"
     },
-    "T6_inexpressible|M": {
-      "target": "T6_inexpressible",
+    "T5_transcend::M": {
+      "target_id": "T5_transcend",
       "condition": "M",
-      "R": null,
-      "p": null,
-      "n_tail": 5,
-      "xmin": null
+      "R": -60.3915,
+      "p": 1.6357e-10,
+      "n": 127,
+      "xmin": 1,
+      "preference": "exponential"
     },
-    "T6_inexpressible|S": {
-      "target": "T6_inexpressible",
+    "T5_transcend::S": {
+      "target_id": "T5_transcend",
       "condition": "S",
-      "R": null,
-      "p": null,
-      "n_tail": 7,
-      "xmin": null
+      "R": -65.6766,
+      "p": 8.616e-80,
+      "n": 137,
+      "xmin": 1,
+      "preference": "exponential"
     },
-    "T6_inexpressible|C": {
-      "target": "T6_inexpressible",
+    "T6_inexpressible::C": {
+      "target_id": "T6_inexpressible",
       "condition": "C",
-      "R": 65.1364,
-      "p": 5.8032e-08,
-      "n_tail": 229,
-      "xmin": 2.4
+      "R": 925.7311,
+      "p": 9.2655e-76,
+      "n": 1897,
+      "xmin": 1,
+      "preference": "lognormal"
+    },
+    "T6_inexpressible::M": {
+      "target_id": "T6_inexpressible",
+      "condition": "M",
+      "R": 16.4922,
+      "p": 0.7553,
+      "n": 122,
+      "xmin": 2,
+      "preference": "ambiguous"
+    },
+    "T6_inexpressible::S": {
+      "target_id": "T6_inexpressible",
+      "condition": "S",
+      "R": 16.8333,
+      "p": 0.7547,
+      "n": 121,
+      "xmin": 2,
+      "preference": "ambiguous"
     }
   },
-  "csn_n_C_cells": 5,
-  "csn_n_S_cells": 5,
-  "csn_C_lognormal_significant": 2,
-  "csn_S_exponential_significant": 0,
-  "csn_C_lognormal_threshold": 4,
-  "csn_S_exponential_threshold": 3,
-  "crit_i_wilcoxon_fires": false,
-  "crit_ii_spearman_fires": true,
-  "crit_iii_csn_fires": true,
+  "cell_table": {
+    "T1_poly_sep::C": {
+      "target_id": "T1_poly_sep",
+      "condition": "C",
+      "sigma_late": 1.6038,
+      "mean_size": 16.1643,
+      "mean_portal": 0.3225,
+      "n_reps": 120,
+      "n_late_events": 1513
+    },
+    "T1_poly_sep::M": {
+      "target_id": "T1_poly_sep",
+      "condition": "M",
+      "sigma_late": 0.0249,
+      "mean_size": 7.7167,
+      "mean_portal": 0.2013,
+      "n_reps": 120,
+      "n_late_events": 366
+    },
+    "T1_poly_sep::S": {
+      "target_id": "T1_poly_sep",
+      "condition": "S",
+      "sigma_late": 0.0579,
+      "mean_size": 49.3099,
+      "mean_portal": 0.32,
+      "n_reps": 120,
+      "n_late_events": 396
+    },
+    "T2_coupled::C": {
+      "target_id": "T2_coupled",
+      "condition": "C",
+      "sigma_late": 1.4706,
+      "mean_size": 16.5977,
+      "mean_portal": 0.3012,
+      "n_reps": 120,
+      "n_late_events": 1552
+    },
+    "T2_coupled::M": {
+      "target_id": "T2_coupled",
+      "condition": "M",
+      "sigma_late": 0.004,
+      "mean_size": 7.9786,
+      "mean_portal": 0.225,
+      "n_reps": 120,
+      "n_late_events": 165
+    },
+    "T2_coupled::S": {
+      "target_id": "T2_coupled",
+      "condition": "S",
+      "sigma_late": 0.0095,
+      "mean_size": 52.6702,
+      "mean_portal": 0.3312,
+      "n_reps": 120,
+      "n_late_events": 165
+    },
+    "T3_rational::C": {
+      "target_id": "T3_rational",
+      "condition": "C",
+      "sigma_late": 1.151,
+      "mean_size": 25.8652,
+      "mean_portal": 0.3012,
+      "n_reps": 120,
+      "n_late_events": 1563
+    },
+    "T3_rational::M": {
+      "target_id": "T3_rational",
+      "condition": "M",
+      "sigma_late": 0.6355,
+      "mean_size": 16.7116,
+      "mean_portal": 0.1725,
+      "n_reps": 120,
+      "n_late_events": 155
+    },
+    "T3_rational::S": {
+      "target_id": "T3_rational",
+      "condition": "S",
+      "sigma_late": 0.4671,
+      "mean_size": 92.7141,
+      "mean_portal": 0.27,
+      "n_reps": 120,
+      "n_late_events": 124
+    },
+    "T4_deep_mul::C": {
+      "target_id": "T4_deep_mul",
+      "condition": "C",
+      "sigma_late": 1.3389,
+      "mean_size": 15.7822,
+      "mean_portal": 0.3388,
+      "n_reps": 120,
+      "n_late_events": 2067
+    },
+    "T4_deep_mul::M": {
+      "target_id": "T4_deep_mul",
+      "condition": "M",
+      "sigma_late": 0.3997,
+      "mean_size": 7.2955,
+      "mean_portal": 0.2488,
+      "n_reps": 120,
+      "n_late_events": 799
+    },
+    "T4_deep_mul::S": {
+      "target_id": "T4_deep_mul",
+      "condition": "S",
+      "sigma_late": 0.3052,
+      "mean_size": 54.0073,
+      "mean_portal": 0.2875,
+      "n_reps": 120,
+      "n_late_events": 989
+    },
+    "T5_transcend::C": {
+      "target_id": "T5_transcend",
+      "condition": "C",
+      "sigma_late": 1.3223,
+      "mean_size": 25.519,
+      "mean_portal": 0.3238,
+      "n_reps": 120,
+      "n_late_events": 1405
+    },
+    "T5_transcend::M": {
+      "target_id": "T5_transcend",
+      "condition": "M",
+      "sigma_late": 0.0709,
+      "mean_size": 18.5452,
+      "mean_portal": 0.2162,
+      "n_reps": 120,
+      "n_late_events": 127
+    },
+    "T5_transcend::S": {
+      "target_id": "T5_transcend",
+      "condition": "S",
+      "sigma_late": 0.1929,
+      "mean_size": 89.3999,
+      "mean_portal": 0.3125,
+      "n_reps": 120,
+      "n_late_events": 137
+    },
+    "T6_inexpressible::C": {
+      "target_id": "T6_inexpressible",
+      "condition": "C",
+      "sigma_late": 1.4138,
+      "mean_size": 14.6261,
+      "mean_portal": 0.3325,
+      "n_reps": 120,
+      "n_late_events": 1897
+    },
+    "T6_inexpressible::M": {
+      "target_id": "T6_inexpressible",
+      "condition": "M",
+      "sigma_late": 0.0429,
+      "mean_size": 7.9249,
+      "mean_portal": 0.1688,
+      "n_reps": 120,
+      "n_late_events": 122
+    },
+    "T6_inexpressible::S": {
+      "target_id": "T6_inexpressible",
+      "condition": "S",
+      "sigma_late": 0.0086,
+      "mean_size": 51.454,
+      "mean_portal": 0.2988,
+      "n_reps": 120,
+      "n_late_events": 121
+    }
+  },
+  "null_criteria_fired": [
+    "test2",
+    "test3"
+  ],
   "mechanism_demonstrated": false,
-  "data_completeness_note": "Plan called for 540 tasks across 6 targets x 3 conditions x 30 reps; result.json contains 540 gp_run results covering 6 target(s): T1_poly_sep, T2_coupled, T3_rational, T4_deep_mul, T5_transcend, T6_inexpressible. Targets T4_deep_mul, T5_transcend, T6_inexpressible absent; T3_rational partial (20 reps)."
+  "scope_note": "Executed results contain 2160 gp_run tasks across 6 target(s) and conditions {C, M, S}; plan called for 6 targets x {M,S,C}. Tests requiring conditions not present are reported as not computable."
 }
