@@ -1,144 +1,128 @@
 library(jsonlite)
-library(ggplot2)
+library(dplyr)
 
-raw <- fromJSON("result.json", simplifyVector = FALSE)$results
+res <- fromJSON("result.json", simplifyVector = FALSE)$results
 
-# Build per-(target, condition) records
-recs <- lapply(raw, function(r) {
-  list(
+# Build per-(target, condition) table
+rows <- lapply(res, function(r) {
+  data.frame(
     target_id = r$target_id,
     primitives = r$primitives,
     sigma_late = r$pooled_sigma_late,
-    sigma_early = r$pooled_sigma_early,
     mu_late = r$pooled_mu_late,
     n_late = r$n_late_events,
-    nn_size = r$neutral_proxy$mean_class_size_weighted,
-    durations_late = unlist(r$pooled_late_durations_sample),
+    sigma_early = r$pooled_sigma_early,
+    nn_mean_class = r$neutral_proxy$mean_class_size_weighted,
     csn_R = r$csn_late$R,
-    csn_p = r$csn_late$p
+    csn_p = r$csn_late$p,
+    csn_n_tail = r$csn_late$n_tail,
+    stringsAsFactors = FALSE
   )
 })
+df <- do.call(rbind, rows)
 
-targets <- unique(sapply(recs, function(x) x$target_id))
+# Pivot to wide form per target
+targets <- unique(df$target_id)
+wide <- data.frame(
+  target_id = targets,
+  sigma_late_minimal = sapply(targets, function(t) df$sigma_late[df$target_id == t & df$primitives == "minimal"]),
+  sigma_late_rich    = sapply(targets, function(t) df$sigma_late[df$target_id == t & df$primitives == "rich"]),
+  nn_minimal         = sapply(targets, function(t) df$nn_mean_class[df$target_id == t & df$primitives == "minimal"]),
+  nn_rich            = sapply(targets, function(t) df$nn_mean_class[df$target_id == t & df$primitives == "rich"]),
+  stringsAsFactors = FALSE
+)
+wide$delta_sigma <- wide$sigma_late_rich - wide$sigma_late_minimal
+wide$nn_ratio <- wide$nn_rich / wide$nn_minimal
 
-# Build paired sigma vectors
-sigma_min <- numeric(length(targets))
-sigma_rich <- numeric(length(targets))
-nn_min <- numeric(length(targets))
-nn_rich <- numeric(length(targets))
-csn_R_rich <- numeric(length(targets))
-csn_p_rich <- numeric(length(targets))
-names(sigma_min) <- targets
-names(sigma_rich) <- targets
-names(nn_min) <- targets
-names(nn_rich) <- targets
-names(csn_R_rich) <- targets
-names(csn_p_rich) <- targets
+# Test 1: paired Wilcoxon, one-sided greater (rich > minimal)
+wt <- wilcox.test(wide$sigma_late_rich, wide$sigma_late_minimal,
+                  paired = TRUE, alternative = "greater", exact = FALSE)
 
-for (r in recs) {
-  if (r$primitives == "minimal") {
-    sigma_min[r$target_id] <- r$sigma_late
-    nn_min[r$target_id] <- r$nn_size
-  } else {
-    sigma_rich[r$target_id] <- r$sigma_late
-    nn_rich[r$target_id] <- r$nn_size
-    csn_R_rich[r$target_id] <- r$csn_R
-    csn_p_rich[r$target_id] <- r$csn_p
-  }
-}
-
-delta_sigma <- sigma_rich - sigma_min
-nn_ratio <- nn_rich / nn_min
-
-# Test 1: paired Wilcoxon, one-sided greater
-w <- wilcox.test(sigma_rich, sigma_min, paired = TRUE, alternative = "greater")
-
-# Test 2: Spearman rho with bootstrap CI
-sp <- suppressWarnings(cor.test(delta_sigma, nn_ratio, method = "spearman"))
+# Test 2: Spearman correlation + bootstrap CI
+ct <- cor.test(wide$delta_sigma, wide$nn_ratio, method = "spearman", exact = FALSE)
 
 set.seed(42)
-n_boot <- 5000
-n_t <- length(targets)
-boot_rhos <- numeric(n_boot)
-for (i in seq_len(n_boot)) {
-  idx <- sample(seq_len(n_t), n_t, replace = TRUE)
-  if (length(unique(idx)) < 2) {
-    boot_rhos[i] <- NA
-    next
-  }
-  boot_rhos[i] <- suppressWarnings(cor(delta_sigma[idx], nn_ratio[idx], method = "spearman"))
+B <- 5000
+n <- nrow(wide)
+boot_rho <- numeric(B)
+for (i in seq_len(B)) {
+  idx <- sample.int(n, n, replace = TRUE)
+  if (length(unique(idx)) < 3) { boot_rho[i] <- NA; next }
+  x <- wide$delta_sigma[idx]; y <- wide$nn_ratio[idx]
+  if (sd(x) == 0 || sd(y) == 0) { boot_rho[i] <- NA; next }
+  boot_rho[i] <- suppressWarnings(cor(x, y, method = "spearman"))
 }
-boot_rhos <- boot_rhos[is.finite(boot_rhos)]
-ci <- quantile(boot_rhos, c(0.025, 0.975), na.rm = TRUE)
+boot_rho <- boot_rho[is.finite(boot_rho)]
+ci <- quantile(boot_rho, c(0.025, 0.975))
 
-# Test 3: CSN per-target rich condition (already computed in result.json as csn_late R,p)
-csn_per_target <- lapply(targets, function(t) {
+# Test 3: csn_late R and p per target (rich)
+csn_rich <- df[df$primitives == "rich", c("target_id", "csn_R", "csn_p", "csn_n_tail")]
+csn_rich_list <- setNames(lapply(seq_len(nrow(csn_rich)), function(i) {
+  list(R = csn_rich$csn_R[i], p = csn_rich$csn_p[i],
+       n_tail = csn_rich$csn_n_tail[i],
+       significant = csn_rich$csn_p[i] < 0.05)
+}), csn_rich$target_id)
+
+# Pass/fail evaluations per null criteria
+wilcox_pass <- (wt$p.value < 0.05) && (median(wide$delta_sigma) > 0 || mean(wide$delta_sigma) > 0) &&
+               all(sign(wide$delta_sigma) >= 0) == FALSE  # direction check below
+direction_all_positive <- all(wide$delta_sigma > 0)
+direction_mixed <- any(wide$delta_sigma > 0) && any(wide$delta_sigma < 0)
+wilcox_pass <- (wt$p.value < 0.05) && !direction_mixed
+
+spearman_ci_crosses_zero <- (ci[1] <= 0) && (ci[2] >= 0)
+spearman_pass <- !spearman_ci_crosses_zero && (ct$estimate > 0)
+
+csn_all_significant <- all(sapply(csn_rich_list, function(x) x$significant))
+csn_pass <- csn_all_significant
+
+overall_pass <- wilcox_pass && spearman_pass && csn_pass
+
+# Per-target table for narrative
+per_target <- setNames(lapply(seq_len(nrow(wide)), function(i) {
   list(
-    target_id = t,
-    R = csn_R_rich[[t]],
-    p = csn_p_rich[[t]],
-    significant = csn_p_rich[[t]] < 0.05,
-    lognormal_preferred = (csn_R_rich[[t]] < 0) && (csn_p_rich[[t]] < 0.05)
+    sigma_late_minimal = wide$sigma_late_minimal[i],
+    sigma_late_rich = wide$sigma_late_rich[i],
+    delta_sigma = wide$delta_sigma[i],
+    nn_minimal = wide$nn_minimal[i],
+    nn_rich = wide$nn_rich[i],
+    nn_ratio = wide$nn_ratio[i]
   )
-})
-
-# Pass/fail per null_result_criteria
-crit_i_pass <- (w$p.value < 0.05) && all(delta_sigma > 0) == FALSE  
-# direction: hypothesis says rich>minimal. Mixed direction = fail.
-direction_consistent <- all(delta_sigma > 0)
-# null criterion (i) fails if p>0.05 OR mixed direction
-crit_i_fail <- (w$p.value > 0.05) || !direction_consistent
-crit_ii_fail <- (ci[1] <= 0) && (ci[2] >= 0)
-# crit iii: distinguishable in any target = at least one significant. Fails if NONE significant.
-any_csn_sig <- any(csn_p_rich < 0.05)
-crit_iii_fail <- !any_csn_sig
-
-mechanism_demonstrated <- !crit_i_fail && !crit_ii_fail && !crit_iii_fail
-
-# Per-target table
-per_target_table <- lapply(targets, function(t) {
-  list(
-    target_id = t,
-    sigma_minimal = sigma_min[[t]],
-    sigma_rich = sigma_rich[[t]],
-    delta_sigma = delta_sigma[[t]],
-    nn_minimal = nn_min[[t]],
-    nn_rich = nn_rich[[t]],
-    nn_ratio = nn_ratio[[t]]
-  )
-})
+}), wide$target_id)
 
 stats <- list(
-  targets = targets,
-  sigma_minimal = as.list(sigma_min),
-  sigma_rich = as.list(sigma_rich),
-  delta_sigma = as.list(delta_sigma),
-  nn_minimal = as.list(nn_min),
-  nn_rich = as.list(nn_rich),
-  nn_ratio = as.list(nn_ratio),
-  per_target_table = per_target_table,
-  wilcoxon_V = unname(w$statistic),
-  wilcoxon_p = w$p.value,
-  wilcoxon_alternative = "greater",
-  direction_consistent = direction_consistent,
-  n_targets_rich_gt_minimal = sum(delta_sigma > 0),
-  n_targets_total = length(targets),
-  spearman_rho = unname(sp$estimate),
-  spearman_p = sp$p.value,
+  n_targets = nrow(wide),
+  wilcoxon_V = unname(wt$statistic),
+  wilcoxon_p = wt$p.value,
+  wilcoxon_alternative = "rich > minimal (one-sided)",
+  wilcoxon_pass = wilcox_pass,
+  direction_all_positive = direction_all_positive,
+  direction_mixed = direction_mixed,
+  n_positive_deltas = sum(wide$delta_sigma > 0),
+  n_negative_deltas = sum(wide$delta_sigma < 0),
+  median_delta_sigma = median(wide$delta_sigma),
+  mean_delta_sigma = mean(wide$delta_sigma),
+
+  spearman_rho = unname(ct$estimate),
+  spearman_p = ct$p.value,
   spearman_ci_low = unname(ci[1]),
   spearman_ci_high = unname(ci[2]),
-  spearman_ci_crosses_zero = unname((ci[1] <= 0) && (ci[2] >= 0)),
-  csn_per_target = csn_per_target,
-  n_targets_csn_significant = sum(csn_p_rich < 0.05),
-  any_csn_significant = any_csn_sig,
-  crit_i_fail = crit_i_fail,
-  crit_ii_fail = crit_ii_fail,
-  crit_iii_fail = crit_iii_fail,
-  mechanism_demonstrated = mechanism_demonstrated,
-  wilcoxon_pass = !crit_i_fail,
-  spearman_pass = !crit_ii_fail,
-  csn_pass = !crit_iii_fail
+  spearman_ci_crosses_zero = spearman_ci_crosses_zero,
+  spearman_pass = spearman_pass,
+  n_boot = length(boot_rho),
+
+  csn_per_target = csn_rich_list,
+  csn_all_significant = csn_all_significant,
+  csn_n_significant = sum(sapply(csn_rich_list, function(x) x$significant)),
+  csn_pass = csn_pass,
+
+  per_target = per_target,
+  overall_pass = overall_pass,
+
+  nn_ratio_min = min(wide$nn_ratio),
+  nn_ratio_max = max(wide$nn_ratio),
+  nn_ratio_median = median(wide$nn_ratio)
 )
 
-write_json(stats, "stats.json", auto_unbox = TRUE, pretty = TRUE)
+write_json(stats, "stats.json", auto_unbox = TRUE, pretty = TRUE, digits = 6)
 cat("done\n")
