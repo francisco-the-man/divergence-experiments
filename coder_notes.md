@@ -1,0 +1,1 @@
+Smoke test. Returns both observables (sample_mean, sample_stddev) referenced by null_result_criteria, plus n_samples and seed for the reporter to group by.
