@@ -1,151 +1,143 @@
 library(jsonlite)
-library(dplyr)
+library(ggplot2)
 
-raw <- fromJSON("result.json", simplifyVector = FALSE)$results
+res <- fromJSON("result.json", simplifyVector = FALSE)$results
 
-# Build per-(target,condition) table
-rows <- lapply(raw, function(r) {
+# Build per-(target, condition) frame
+rows <- lapply(res, function(r) {
   data.frame(
     target_id = r$target_id,
     primitives = r$primitives,
-    sigma_late = r$pooled_sigma_late,
-    mu_late = r$pooled_mu_late,
-    n_late = r$n_late_events,
-    sigma_early = r$pooled_sigma_early,
-    mu_early = r$pooled_mu_early,
-    n_early = r$n_early_events,
+    pooled_sigma_late = r$pooled_sigma_late,
+    pooled_mu_late = r$pooled_mu_late,
+    n_late_events = r$n_late_events,
+    pooled_sigma_early = r$pooled_sigma_early,
+    pooled_mu_early = r$pooled_mu_early,
+    n_early_events = r$n_early_events,
     csn_R = r$csn_late$R,
     csn_p = r$csn_late$p,
     csn_n_tail = r$csn_late$n_tail,
-    nn_mean_class = r$neutral_proxy$mean_class_size_weighted,
-    nn_max_class = r$neutral_proxy$max_class_size,
+    nn_mean_class_size = r$neutral_proxy$mean_class_size_weighted,
+    nn_n_classes = r$neutral_proxy$n_classes,
     stringsAsFactors = FALSE
   )
 })
 df <- do.call(rbind, rows)
+print(df)
 
-# Reshape: per target, both conditions
-targets <- unique(df$target_id)
-per_target <- lapply(targets, function(t) {
-  m <- df[df$target_id == t & df$primitives == "minimal", ]
-  r <- df[df$target_id == t & df$primitives == "rich", ]
-  list(
-    target_id = t,
-    sigma_minimal = m$sigma_late,
-    sigma_rich = r$sigma_late,
-    delta_sigma = r$sigma_late - m$sigma_late,
-    nn_minimal = m$nn_mean_class,
-    nn_rich = r$nn_mean_class,
-    nn_ratio = r$nn_mean_class / m$nn_mean_class,
-    csn_R_rich = r$csn_R,
-    csn_p_rich = r$csn_p,
-    csn_n_tail_rich = r$csn_n_tail
-  )
-})
+# Pivot to wide on primitives
+targets <- sort(unique(df$target_id))
+sigma_minimal <- sapply(targets, function(t) df$pooled_sigma_late[df$target_id == t & df$primitives == "minimal"])
+sigma_rich    <- sapply(targets, function(t) df$pooled_sigma_late[df$target_id == t & df$primitives == "rich"])
+nn_minimal    <- sapply(targets, function(t) df$nn_mean_class_size[df$target_id == t & df$primitives == "minimal"])
+nn_rich       <- sapply(targets, function(t) df$nn_mean_class_size[df$target_id == t & df$primitives == "rich"])
+delta_sigma   <- sigma_rich - sigma_minimal
+nn_ratio      <- nn_rich / nn_minimal
 
-sigma_minimal <- sapply(per_target, function(x) x$sigma_minimal)
-sigma_rich <- sapply(per_target, function(x) x$sigma_rich)
-delta_sigma <- sapply(per_target, function(x) x$delta_sigma)
-nn_ratio <- sapply(per_target, function(x) x$nn_ratio)
-target_ids <- sapply(per_target, function(x) x$target_id)
+cat("\nPer-target table:\n")
+per_target_tbl <- data.frame(
+  target_id = targets,
+  sigma_minimal = sigma_minimal,
+  sigma_rich = sigma_rich,
+  delta_sigma = delta_sigma,
+  nn_minimal = nn_minimal,
+  nn_rich = nn_rich,
+  nn_ratio = nn_ratio
+)
+print(per_target_tbl)
 
-# Test 1: paired Wilcoxon (one-sided rich > minimal)
-wilc <- wilcox.test(sigma_rich, sigma_minimal, paired = TRUE, alternative = "greater", exact = FALSE)
+# Test 1: Paired Wilcoxon one-sided (rich > minimal)
+w <- wilcox.test(sigma_rich, sigma_minimal, paired = TRUE, alternative = "greater", exact = TRUE)
+cat("\nWilcoxon:\n"); print(w)
 
-# Test 2: Spearman + bootstrap CI
-cor_res <- cor.test(delta_sigma, nn_ratio, method = "spearman", exact = FALSE)
+# Test 2: Spearman rho + bootstrap CI
+sp <- suppressWarnings(cor.test(delta_sigma, nn_ratio, method = "spearman", exact = FALSE))
+cat("\nSpearman:\n"); print(sp)
+
 set.seed(42)
 B <- 5000
-boot_rho <- replicate(B, {
-  idx <- sample(seq_along(delta_sigma), replace = TRUE)
-  if (length(unique(delta_sigma[idx])) < 2 || length(unique(nn_ratio[idx])) < 2) return(NA_real_)
+n <- length(delta_sigma)
+boot_rhos <- replicate(B, {
+  idx <- sample.int(n, n, replace = TRUE)
+  if (length(unique(idx)) < 2) return(NA_real_)
   suppressWarnings(cor(delta_sigma[idx], nn_ratio[idx], method = "spearman"))
 })
-boot_rho <- boot_rho[is.finite(boot_rho)]
-ci_low <- as.numeric(quantile(boot_rho, 0.025))
-ci_high <- as.numeric(quantile(boot_rho, 0.975))
+boot_rhos <- boot_rhos[is.finite(boot_rhos)]
+boot_ci <- quantile(boot_rhos, c(0.025, 0.975), na.rm = TRUE)
+cat("\nBootstrap Spearman CI:\n"); print(boot_ci)
 
-# Test 3: CSN log-normal vs exponential — already done in coder, R<0 favors log-normal
-# Report per-target rich condition R, p, n_tail
-csn_table <- lapply(per_target, function(x) {
-  list(
-    target_id = x$target_id,
-    R = x$csn_R_rich,
-    p = x$csn_p_rich,
-    n_tail = x$csn_n_tail_rich,
-    favors_lognormal = (x$csn_R_rich < 0) && (x$csn_p_rich < 0.05),
-    significant_at_05 = (x$csn_p_rich < 0.05)
-  )
+# Test 3: CSN log-normal vs exponential per (target, rich) — use the precomputed csn_late.R and .p
+csn_rich <- lapply(targets, function(t) {
+  r <- df[df$target_id == t & df$primitives == "rich", ]
+  list(target_id = t, R = r$csn_R, p = r$csn_p, n_tail = r$csn_n_tail,
+       significant_at_05 = (r$csn_p < 0.05))
 })
+names(csn_rich) <- targets
 
-# Pass/fail per null criterion
-# (i) Wilcoxon p>0.05 OR direction mixed => null
-direction_positive_count <- sum(delta_sigma > 0)
-direction_mixed <- !(all(delta_sigma > 0) || all(delta_sigma < 0))
-wilc_pass <- (wilc$p.value <= 0.05) && !direction_mixed && (mean(sigma_rich) > mean(sigma_minimal) || median(delta_sigma) > 0)
-
-# (ii) Spearman CI crosses 0 => null
-ci_crosses_zero <- (ci_low <= 0) && (ci_high >= 0)
-spearman_pass <- !ci_crosses_zero && (cor_res$estimate > 0)
-
-# (iii) CSN: requires significant log-normal vs exponential in EVERY target (rich)
-# "not significantly distinguishable in any target" = null
-# So pass = at least one target has p<0.05 AND favors log-normal? Plan: "not significantly distinguishable in any target (log-likelihood ratio not significant at α=0.05)" — read as: if NO target shows significance, null. Pass = at least one target significant. Stronger reading: every target shows significance. Use strict: all targets.
-csn_p_vec <- sapply(csn_table, function(x) x$p)
-csn_R_vec <- sapply(csn_table, function(x) x$R)
-csn_all_significant <- all(csn_p_vec < 0.05)
-csn_any_significant <- any(csn_p_vec < 0.05)
-csn_pass <- csn_all_significant  # strict reading
-
-# Overall mechanism demonstrated requires all three to pass
-mechanism_demonstrated <- wilc_pass && spearman_pass && csn_pass
-
+# Build stats
 stats <- list(
-  # per-target table
-  target_ids = as.list(target_ids),
-  sigma_minimal_by_target = as.list(sigma_minimal),
-  sigma_rich_by_target = as.list(sigma_rich),
-  delta_sigma_by_target = as.list(delta_sigma),
-  nn_minimal_by_target = as.list(sapply(per_target, function(x) x$nn_minimal)),
-  nn_rich_by_target = as.list(sapply(per_target, function(x) x$nn_rich)),
-  nn_ratio_by_target = as.list(nn_ratio),
-
-  # Wilcoxon
-  wilcoxon_V = as.numeric(wilc$statistic),
-  wilcoxon_p = as.numeric(wilc$p.value),
-  wilcoxon_alternative = "greater (rich > minimal)",
-  mean_sigma_minimal = mean(sigma_minimal),
-  mean_sigma_rich = mean(sigma_rich),
-  median_delta_sigma = median(delta_sigma),
-  n_targets_positive_shift = direction_positive_count,
-  n_targets_total = length(delta_sigma),
-  direction_mixed = direction_mixed,
-  wilcoxon_pass = wilc_pass,
-
-  # Spearman
-  spearman_rho = as.numeric(cor_res$estimate),
-  spearman_p = as.numeric(cor_res$p.value),
-  spearman_ci_low = ci_low,
-  spearman_ci_high = ci_high,
-  spearman_ci_crosses_zero = ci_crosses_zero,
-  spearman_n_boot = length(boot_rho),
-  spearman_pass = spearman_pass,
-
-  # CSN per target (rich)
-  csn_per_target = csn_table,
-  csn_all_significant = csn_all_significant,
-  csn_any_significant = csn_any_significant,
-  csn_n_significant = sum(csn_p_vec < 0.05),
-  csn_pass = csn_pass,
-
-  # Overall
-  mechanism_demonstrated = mechanism_demonstrated,
-
-  # Ranges for plots
-  nn_ratio_range = c(min(nn_ratio), max(nn_ratio)),
-  delta_sigma_range = c(min(delta_sigma), max(delta_sigma))
+  targets = targets,
+  per_target = list(
+    target_id = targets,
+    sigma_minimal = unname(sigma_minimal),
+    sigma_rich = unname(sigma_rich),
+    delta_sigma = unname(delta_sigma),
+    nn_minimal = unname(nn_minimal),
+    nn_rich = unname(nn_rich),
+    nn_ratio = unname(nn_ratio)
+  ),
+  wilcoxon = list(
+    V = unname(w$statistic),
+    p_value = w$p.value,
+    alternative = "greater",
+    n_pairs = length(delta_sigma),
+    n_positive = sum(delta_sigma > 0),
+    n_negative = sum(delta_sigma < 0),
+    median_delta = median(delta_sigma),
+    mean_delta = mean(delta_sigma),
+    pass = (w$p.value < 0.05)
+  ),
+  spearman = list(
+    rho = unname(sp$estimate),
+    p_value = sp$p.value,
+    boot_ci_low = unname(boot_ci[1]),
+    boot_ci_high = unname(boot_ci[2]),
+    boot_B = B,
+    ci_crosses_zero = (boot_ci[1] <= 0) && (boot_ci[2] >= 0),
+    pass = !((boot_ci[1] <= 0) && (boot_ci[2] >= 0))
+  ),
+  csn_rich = list(
+    per_target = lapply(csn_rich, function(x) list(target_id = x$target_id, R = x$R, p = x$p, n_tail = x$n_tail, significant_at_05 = x$significant_at_05)),
+    all_significant = all(sapply(csn_rich, function(x) x$significant_at_05)),
+    n_significant = sum(sapply(csn_rich, function(x) x$significant_at_05)),
+    n_total = length(csn_rich),
+    pass = all(sapply(csn_rich, function(x) x$significant_at_05))
+  ),
+  overall_pass = NA  # filled below
 )
 
-write_json(stats, "stats.json", auto_unbox = TRUE, pretty = TRUE, digits = 6)
-cat("WROTE stats.json\n")
-print(stats)
+stats$overall_pass <- stats$wilcoxon$pass && stats$spearman$pass && stats$csn_rich$pass
+
+# Pre-compute CCDF data for plotting (pooled late durations per target × condition)
+ccdf_data <- list()
+for (r in res) {
+  key <- paste(r$target_id, r$primitives, sep = "__")
+  durs <- unlist(r$pooled_late_durations_sample)
+  durs <- durs[durs > 0]
+  if (length(durs) == 0) next
+  s <- sort(durs)
+  ccdf_data[[key]] <- list(
+    target_id = r$target_id,
+    primitives = r$primitives,
+    x = s,
+    ccdf = (length(s):1) / length(s)
+  )
+}
+stats$ccdf_summary <- list(
+  n_series = length(ccdf_data),
+  max_duration = max(sapply(ccdf_data, function(d) max(d$x)))
+)
+
+write_json(stats, "stats.json", auto_unbox = TRUE, pretty = TRUE, digits = 8)
+cat("\nstats.json written\n")
+cat(readLines("stats.json"), sep = "\n")
