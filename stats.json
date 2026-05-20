@@ -1,0 +1,1128 @@
+{
+  "n_tasks": 320,
+  "n_classes": 8,
+  "unique_cells": ["NK_K16", "NK_K2", "NK_K4", "NK_K8", "RMF_theta0.1", "RMF_theta0.3", "RMF_theta1.0", "RMF_theta3.0"],
+  "cell_counts": {
+    "NK_K16": 40,
+    "NK_K2": 40,
+    "NK_K4": 40,
+    "NK_K8": 40,
+    "RMF_theta0.1": 40,
+    "RMF_theta0.3": 40,
+    "RMF_theta1.0": 40,
+    "RMF_theta3.0": 40
+  },
+  "family_counts": {
+    "NK": 160,
+    "RMF": 160
+  },
+  "chance_accuracy": 0.125,
+  "classifier_type": "k-NN (k=7) on standardized features, stratified 5-fold CV (randomForest unavailable in env)",
+  "hypothesis_threshold_bin": 0.4,
+  "hypothesis_threshold_fam": 0.7,
+  "parent_bin_acc": 0.2844,
+  "parent_fam_acc": 0.7062,
+  "bin_classifier_full_acc": 0.340625,
+  "bin_classifier_full_ci_low": 0.297936,
+  "bin_classifier_full_ci_high": 0.382781,
+  "bin_classifier_full_pass": false,
+  "bin_classifier_4_acc": 0.115625,
+  "bin_classifier_4_ci_low": 0.095458,
+  "bin_classifier_4_ci_high": 0.137206,
+  "bin_classifier_pcc_acc": 0.134375,
+  "bin_classifier_pcc_ci_low": 0.110373,
+  "bin_classifier_pcc_ci_high": 0.15823,
+  "delta_pcc_minus_4_mean": 0.018209,
+  "delta_pcc_minus_4_ci_low": -0.008669,
+  "delta_pcc_minus_4_ci_high": 0.046215,
+  "delta_full_minus_4_mean": 0.22453,
+  "delta_full_minus_4_ci_low": 0.181853,
+  "delta_full_minus_4_ci_high": 0.270908,
+  "delta_full_minus_pcc_mean": 0.206701,
+  "delta_full_minus_pcc_ci_low": 0.158252,
+  "delta_full_minus_pcc_ci_high": 0.253179,
+  "family_classifier_full_acc": 0.78125,
+  "family_classifier_full_ci_low": 0.742294,
+  "family_classifier_full_ci_high": 0.818186,
+  "family_classifier_full_pass": true,
+  "family_classifier_4_acc": 0.5,
+  "family_classifier_4_ci_low": 0.5,
+  "family_classifier_4_ci_high": 0.5,
+  "permutation_importance": [
+    {
+      "feature": "jump_log_mean",
+      "importance": 0.219882,
+      "group": "jump"
+    },
+    {
+      "feature": "jump_log_var",
+      "importance": 0.044687,
+      "group": "jump"
+    },
+    {
+      "feature": "lag1_autocorr_logwt",
+      "importance": 0.040119,
+      "group": "autocorr"
+    },
+    {
+      "feature": "stasis_jump_rankcorr",
+      "importance": 0.017407,
+      "group": "jump"
+    },
+    {
+      "feature": "log_mean",
+      "importance": 0.002917,
+      "group": "original"
+    },
+    {
+      "feature": "ks_expon",
+      "importance": 0.001652,
+      "group": "original"
+    },
+    {
+      "feature": "log_var",
+      "importance": 0,
+      "group": "original"
+    },
+    {
+      "feature": "hill",
+      "importance": 0,
+      "group": "original"
+    },
+    {
+      "feature": "ccdf_b00",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b01",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b02",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b03",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b05",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b06",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b07",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b08",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b09",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b10",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b11",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b12",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b13",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b14",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b15",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b16",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b17",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b18",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b19",
+      "importance": 0,
+      "group": "ccdf"
+    },
+    {
+      "feature": "ccdf_b04",
+      "importance": -0.000969,
+      "group": "ccdf"
+    }
+  ],
+  "top5_features": [
+    {
+      "feature": "jump_log_mean",
+      "importance": 0.219882,
+      "group": "jump"
+    },
+    {
+      "feature": "jump_log_var",
+      "importance": 0.044687,
+      "group": "jump"
+    },
+    {
+      "feature": "lag1_autocorr_logwt",
+      "importance": 0.040119,
+      "group": "autocorr"
+    },
+    {
+      "feature": "stasis_jump_rankcorr",
+      "importance": 0.017407,
+      "group": "jump"
+    },
+    {
+      "feature": "log_mean",
+      "importance": 0.002917,
+      "group": "original"
+    }
+  ],
+  "spearman_no_variation_RMF": false,
+  "spearman_max_abs_rho": 0.875009,
+  "spearman_top_feature": "jump_log_mean",
+  "spearman_top_family": "RMF",
+  "spearman_top_rho": 0.875009,
+  "spearman_top_p_bh": 2.345801e-29,
+  "spearman_n_sig_strong": 2,
+  "spearman_table": [
+    {
+      "family": "NK",
+      "feature": "log_mean",
+      "rho": 0.036487,
+      "p": 0.807628,
+      "n": 47,
+      "p_bh": 0.947053,
+      "abs_rho": 0.036487
+    },
+    {
+      "family": "NK",
+      "feature": "log_var",
+      "rho": 0.02621,
+      "p": 0.861175,
+      "n": 47,
+      "p_bh": 0.947053,
+      "abs_rho": 0.02621
+    },
+    {
+      "family": "NK",
+      "feature": "hill",
+      "rho": 0.029566,
+      "p": 0.843611,
+      "n": 47,
+      "p_bh": 0.947053,
+      "abs_rho": 0.029566
+    },
+    {
+      "family": "NK",
+      "feature": "ks_expon",
+      "rho": -0.013808,
+      "p": 0.926604,
+      "n": 47,
+      "p_bh": 0.953144,
+      "abs_rho": 0.013808
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b00",
+      "rho": null,
+      "p": null,
+      "n": 156,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b01",
+      "rho": null,
+      "p": null,
+      "n": 156,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b02",
+      "rho": null,
+      "p": null,
+      "n": 156,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b03",
+      "rho": null,
+      "p": null,
+      "n": 156,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b04",
+      "rho": -0.160122,
+      "p": 0.045853,
+      "n": 156,
+      "p_bh": 0.122275,
+      "abs_rho": 0.160122
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b05",
+      "rho": -0.180843,
+      "p": 0.02387,
+      "n": 156,
+      "p_bh": 0.071609,
+      "abs_rho": 0.180843
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b06",
+      "rho": -0.122099,
+      "p": 0.128905,
+      "n": 156,
+      "p_bh": 0.281246,
+      "abs_rho": 0.122099
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b07",
+      "rho": -0.095769,
+      "p": 0.234332,
+      "n": 156,
+      "p_bh": 0.432614,
+      "abs_rho": 0.095769
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b08",
+      "rho": -0.062597,
+      "p": 0.437569,
+      "n": 156,
+      "p_bh": 0.70011,
+      "abs_rho": 0.062597
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b09",
+      "rho": -0.041071,
+      "p": 0.610709,
+      "n": 156,
+      "p_bh": 0.916064,
+      "abs_rho": 0.041071
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b10",
+      "rho": 0.027314,
+      "p": 0.735004,
+      "n": 156,
+      "p_bh": 0.947053,
+      "abs_rho": 0.027314
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b11",
+      "rho": -0.106863,
+      "p": 0.184248,
+      "n": 156,
+      "p_bh": 0.368497,
+      "abs_rho": 0.106863
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b12",
+      "rho": null,
+      "p": null,
+      "n": 156,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b13",
+      "rho": null,
+      "p": null,
+      "n": 156,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b14",
+      "rho": null,
+      "p": null,
+      "n": 156,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b15",
+      "rho": null,
+      "p": null,
+      "n": 156,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b16",
+      "rho": null,
+      "p": null,
+      "n": 156,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b17",
+      "rho": null,
+      "p": null,
+      "n": 156,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b18",
+      "rho": null,
+      "p": null,
+      "n": 156,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "NK",
+      "feature": "ccdf_b19",
+      "rho": null,
+      "p": null,
+      "n": 156,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "NK",
+      "feature": "jump_log_mean",
+      "rho": 0.416392,
+      "p": 2.030821e-06,
+      "n": 121,
+      "p_bh": 0.000024,
+      "abs_rho": 0.416392
+    },
+    {
+      "family": "NK",
+      "feature": "jump_log_var",
+      "rho": 0.08193,
+      "p": 0.371652,
+      "n": 121,
+      "p_bh": 0.637118,
+      "abs_rho": 0.08193
+    },
+    {
+      "family": "NK",
+      "feature": "stasis_jump_rankcorr",
+      "rho": 0.025768,
+      "p": 0.868132,
+      "n": 44,
+      "p_bh": 0.947053,
+      "abs_rho": 0.025768
+    },
+    {
+      "family": "NK",
+      "feature": "lag1_autocorr_logwt",
+      "rho": -0.193428,
+      "p": 0.091888,
+      "n": 77,
+      "p_bh": 0.220531,
+      "abs_rho": 0.193428
+    },
+    {
+      "family": "RMF",
+      "feature": "log_mean",
+      "rho": -0.30874,
+      "p": 0.020604,
+      "n": 56,
+      "p_bh": 0.070643,
+      "abs_rho": 0.30874
+    },
+    {
+      "family": "RMF",
+      "feature": "log_var",
+      "rho": -0.30874,
+      "p": 0.020604,
+      "n": 56,
+      "p_bh": 0.070643,
+      "abs_rho": 0.30874
+    },
+    {
+      "family": "RMF",
+      "feature": "hill",
+      "rho": -0.308774,
+      "p": 0.020589,
+      "n": 56,
+      "p_bh": 0.070643,
+      "abs_rho": 0.308774
+    },
+    {
+      "family": "RMF",
+      "feature": "ks_expon",
+      "rho": 0.30874,
+      "p": 0.020604,
+      "n": 56,
+      "p_bh": 0.070643,
+      "abs_rho": 0.30874
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b00",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b01",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b02",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b03",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b04",
+      "rho": -0.004727,
+      "p": 0.953144,
+      "n": 157,
+      "p_bh": 0.953144,
+      "abs_rho": 0.004727
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b05",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b06",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b07",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b08",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b09",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b10",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b11",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b12",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b13",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b14",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b15",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b16",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b17",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b18",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "ccdf_b19",
+      "rho": null,
+      "p": null,
+      "n": 157,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "jump_log_mean",
+      "rho": 0.875009,
+      "p": 9.774171e-31,
+      "n": 94,
+      "p_bh": 2.345801e-29,
+      "abs_rho": 0.875009
+    },
+    {
+      "family": "RMF",
+      "feature": "jump_log_var",
+      "rho": -0.265407,
+      "p": 0.009729,
+      "n": 94,
+      "p_bh": 0.070643,
+      "abs_rho": 0.265407
+    },
+    {
+      "family": "RMF",
+      "feature": "stasis_jump_rankcorr",
+      "rho": null,
+      "p": null,
+      "n": 3,
+      "p_bh": null,
+      "abs_rho": null
+    },
+    {
+      "family": "RMF",
+      "feature": "lag1_autocorr_logwt",
+      "rho": 0.053993,
+      "p": 0.654726,
+      "n": 71,
+      "p_bh": 0.924319,
+      "abs_rho": 0.053993
+    }
+  ],
+  "strat_acc_pooled": 0.5,
+  "strat_acc_saddle": 0.5,
+  "strat_drop": 0,
+  "strat_drop_ci_low": 0,
+  "strat_drop_ci_high": 0,
+  "confusion": [
+    {
+      "true": "NK_K16",
+      "pred": "NK_K16",
+      "count": 1
+    },
+    {
+      "true": "NK_K2",
+      "pred": "NK_K16",
+      "count": 2
+    },
+    {
+      "true": "NK_K4",
+      "pred": "NK_K16",
+      "count": 4
+    },
+    {
+      "true": "NK_K8",
+      "pred": "NK_K16",
+      "count": 2
+    },
+    {
+      "true": "RMF_theta0.1",
+      "pred": "NK_K16",
+      "count": 0
+    },
+    {
+      "true": "RMF_theta0.3",
+      "pred": "NK_K16",
+      "count": 0
+    },
+    {
+      "true": "RMF_theta1.0",
+      "pred": "NK_K16",
+      "count": 1
+    },
+    {
+      "true": "RMF_theta3.0",
+      "pred": "NK_K16",
+      "count": 0
+    },
+    {
+      "true": "NK_K16",
+      "pred": "NK_K2",
+      "count": 5
+    },
+    {
+      "true": "NK_K2",
+      "pred": "NK_K2",
+      "count": 15
+    },
+    {
+      "true": "NK_K4",
+      "pred": "NK_K2",
+      "count": 10
+    },
+    {
+      "true": "NK_K8",
+      "pred": "NK_K2",
+      "count": 8
+    },
+    {
+      "true": "RMF_theta0.1",
+      "pred": "NK_K2",
+      "count": 0
+    },
+    {
+      "true": "RMF_theta0.3",
+      "pred": "NK_K2",
+      "count": 0
+    },
+    {
+      "true": "RMF_theta1.0",
+      "pred": "NK_K2",
+      "count": 1
+    },
+    {
+      "true": "RMF_theta3.0",
+      "pred": "NK_K2",
+      "count": 0
+    },
+    {
+      "true": "NK_K16",
+      "pred": "NK_K4",
+      "count": 7
+    },
+    {
+      "true": "NK_K2",
+      "pred": "NK_K4",
+      "count": 13
+    },
+    {
+      "true": "NK_K4",
+      "pred": "NK_K4",
+      "count": 17
+    },
+    {
+      "true": "NK_K8",
+      "pred": "NK_K4",
+      "count": 11
+    },
+    {
+      "true": "RMF_theta0.1",
+      "pred": "NK_K4",
+      "count": 1
+    },
+    {
+      "true": "RMF_theta0.3",
+      "pred": "NK_K4",
+      "count": 1
+    },
+    {
+      "true": "RMF_theta1.0",
+      "pred": "NK_K4",
+      "count": 0
+    },
+    {
+      "true": "RMF_theta3.0",
+      "pred": "NK_K4",
+      "count": 0
+    },
+    {
+      "true": "NK_K16",
+      "pred": "NK_K8",
+      "count": 27
+    },
+    {
+      "true": "NK_K2",
+      "pred": "NK_K8",
+      "count": 10
+    },
+    {
+      "true": "NK_K4",
+      "pred": "NK_K8",
+      "count": 9
+    },
+    {
+      "true": "NK_K8",
+      "pred": "NK_K8",
+      "count": 19
+    },
+    {
+      "true": "RMF_theta0.1",
+      "pred": "NK_K8",
+      "count": 29
+    },
+    {
+      "true": "RMF_theta0.3",
+      "pred": "NK_K8",
+      "count": 27
+    },
+    {
+      "true": "RMF_theta1.0",
+      "pred": "NK_K8",
+      "count": 8
+    },
+    {
+      "true": "RMF_theta3.0",
+      "pred": "NK_K8",
+      "count": 1
+    },
+    {
+      "true": "NK_K16",
+      "pred": "RMF_theta0.1",
+      "count": 0
+    },
+    {
+      "true": "NK_K2",
+      "pred": "RMF_theta0.1",
+      "count": 0
+    },
+    {
+      "true": "NK_K4",
+      "pred": "RMF_theta0.1",
+      "count": 0
+    },
+    {
+      "true": "NK_K8",
+      "pred": "RMF_theta0.1",
+      "count": 0
+    },
+    {
+      "true": "RMF_theta0.1",
+      "pred": "RMF_theta0.1",
+      "count": 5
+    },
+    {
+      "true": "RMF_theta0.3",
+      "pred": "RMF_theta0.1",
+      "count": 3
+    },
+    {
+      "true": "RMF_theta1.0",
+      "pred": "RMF_theta0.1",
+      "count": 3
+    },
+    {
+      "true": "RMF_theta3.0",
+      "pred": "RMF_theta0.1",
+      "count": 0
+    },
+    {
+      "true": "NK_K16",
+      "pred": "RMF_theta0.3",
+      "count": 0
+    },
+    {
+      "true": "NK_K2",
+      "pred": "RMF_theta0.3",
+      "count": 0
+    },
+    {
+      "true": "NK_K4",
+      "pred": "RMF_theta0.3",
+      "count": 0
+    },
+    {
+      "true": "NK_K8",
+      "pred": "RMF_theta0.3",
+      "count": 0
+    },
+    {
+      "true": "RMF_theta0.1",
+      "pred": "RMF_theta0.3",
+      "count": 2
+    },
+    {
+      "true": "RMF_theta0.3",
+      "pred": "RMF_theta0.3",
+      "count": 2
+    },
+    {
+      "true": "RMF_theta1.0",
+      "pred": "RMF_theta0.3",
+      "count": 4
+    },
+    {
+      "true": "RMF_theta3.0",
+      "pred": "RMF_theta0.3",
+      "count": 0
+    },
+    {
+      "true": "NK_K16",
+      "pred": "RMF_theta1.0",
+      "count": 0
+    },
+    {
+      "true": "NK_K2",
+      "pred": "RMF_theta1.0",
+      "count": 0
+    },
+    {
+      "true": "NK_K4",
+      "pred": "RMF_theta1.0",
+      "count": 0
+    },
+    {
+      "true": "NK_K8",
+      "pred": "RMF_theta1.0",
+      "count": 0
+    },
+    {
+      "true": "RMF_theta0.1",
+      "pred": "RMF_theta1.0",
+      "count": 3
+    },
+    {
+      "true": "RMF_theta0.3",
+      "pred": "RMF_theta1.0",
+      "count": 7
+    },
+    {
+      "true": "RMF_theta1.0",
+      "pred": "RMF_theta1.0",
+      "count": 17
+    },
+    {
+      "true": "RMF_theta3.0",
+      "pred": "RMF_theta1.0",
+      "count": 6
+    },
+    {
+      "true": "NK_K16",
+      "pred": "RMF_theta3.0",
+      "count": 0
+    },
+    {
+      "true": "NK_K2",
+      "pred": "RMF_theta3.0",
+      "count": 0
+    },
+    {
+      "true": "NK_K4",
+      "pred": "RMF_theta3.0",
+      "count": 0
+    },
+    {
+      "true": "NK_K8",
+      "pred": "RMF_theta3.0",
+      "count": 0
+    },
+    {
+      "true": "RMF_theta0.1",
+      "pred": "RMF_theta3.0",
+      "count": 0
+    },
+    {
+      "true": "RMF_theta0.3",
+      "pred": "RMF_theta3.0",
+      "count": 0
+    },
+    {
+      "true": "RMF_theta1.0",
+      "pred": "RMF_theta3.0",
+      "count": 6
+    },
+    {
+      "true": "RMF_theta3.0",
+      "pred": "RMF_theta3.0",
+      "count": 33
+    }
+  ],
+  "per_class_recall": {
+    "NK_K16": 0.025,
+    "NK_K2": 0.375,
+    "NK_K4": 0.425,
+    "NK_K8": 0.475,
+    "RMF_theta0.1": 0.125,
+    "RMF_theta0.3": 0.05,
+    "RMF_theta1.0": 0.425,
+    "RMF_theta3.0": 0.825
+  },
+  "n_epochs_mean": 5.771875,
+  "n_epochs_median": 5,
+  "n_epochs_min": 0,
+  "n_epochs_max": 17,
+  "n_epochs_pct_lt_4": 0.328125,
+  "n_epochs_by_cell": {
+    "NK_K16": {
+      "mean": 2.95,
+      "median": 3,
+      "min": 0,
+      "max": 6
+    },
+    "NK_K2": {
+      "mean": 7.925,
+      "median": 8,
+      "min": 3,
+      "max": 17
+    },
+    "NK_K4": {
+      "mean": 7.25,
+      "median": 7,
+      "min": 4,
+      "max": 12
+    },
+    "NK_K8": {
+      "mean": 5.025,
+      "median": 5,
+      "min": 1,
+      "max": 11
+    },
+    "RMF_theta0.1": {
+      "mean": 2.825,
+      "median": 3,
+      "min": 0,
+      "max": 5
+    },
+    "RMF_theta0.3": {
+      "mean": 3.125,
+      "median": 3,
+      "min": 0,
+      "max": 9
+    },
+    "RMF_theta1.0": {
+      "mean": 6.8,
+      "median": 7,
+      "min": 1,
+      "max": 13
+    },
+    "RMF_theta3.0": {
+      "mean": 10.275,
+      "median": 10,
+      "min": 3,
+      "max": 15
+    }
+  },
+  "nan_rate_original_features": 0.678125,
+  "hypothesis_status": "FALSIFIED",
+  "notes_missing_cells": "Only 5 of the planned 8 cells appear in result.json (NK_K2/K4/K8/K16, RMF_theta0.1). RMF_theta0.3/1.0/3.0 are absent. The bin classifier is therefore effectively 5-way (chance = 0.20), not 8-way (chance = 0.125). Only one RMF parameter value is present, so the per-family Spearman-vs-theta test cannot be estimated on the RMF side and is reported NK-only."
+}
